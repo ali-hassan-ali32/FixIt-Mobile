@@ -21,6 +21,7 @@ RegisterHandymanRequest _$RegisterHandymanRequestFromJson(
   categoryId: json['categoryId'] as String,
   yearsOfExperience: (json['yearsOfExperience'] as num).toInt(),
   nationalIdImageUrl: json['nationalIdImageUrl'] as String,
+  basePrice: (json['basePrice'] as num).toInt(),
 );
 
 Map<String, dynamic> _$RegisterHandymanRequestToJson(
@@ -37,5 +38,6 @@ Map<String, dynamic> _$RegisterHandymanRequestToJson(
   'addressLine': instance.addressLine,
   'categoryId': instance.categoryId,
   'yearsOfExperience': instance.yearsOfExperience,
+  'basePrice': instance.basePrice,
   'nationalIdImageUrl': instance.nationalIdImageUrl,
 };

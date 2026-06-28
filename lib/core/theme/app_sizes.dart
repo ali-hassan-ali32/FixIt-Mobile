@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 abstract class AppSpacing {
+  static const xxs  = 2.0;
   static const xs   = 8.0;
   static const sm   = 12.0;
   static const md   = 16.0;

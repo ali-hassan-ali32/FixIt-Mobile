@@ -9,9 +9,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../../config/di/di.dart';
 import '../../../../core/l10n/translation/app_localizations.dart';
+import '../../../../core/storage/secure_storage_service.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_sizes.dart';
+import '../../../../core/utils/functions/remeber_me.dart';
 import '../../../../core/utils/widgets/app_auth_background.dart';
 import '../../../../core/utils/widgets/app_category_selector.dart';
 import '../../../../core/utils/widgets/app_date_field.dart';
@@ -274,6 +277,7 @@ abstract class _RegHandymanBase<T extends StatefulWidget> extends State<T>
       categoryId: selectedCategoryIds.first.toString(),
       yearsOfExperience: _mapExperienceYears(),
       nationalIdImageUrl: nationalIdPhoto!.path,
+      basePrice: int.tryParse(rateCtrl.text) ?? 0,
     );
 
     context.read<AuthCubit>().registerHandyman(request);
@@ -662,14 +666,20 @@ class _RegisterHandymanMobileBodyState
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
         state.whenOrNull(
-          success: (user) {
+          success: (user) async{
             AppSnackBar.show(
               context,
               message: l10n.handymanSuccessMessage,
               type: AppSnackType.success,
             );
 
-            // AppConfigProvider.instance.handymanProfilePhoto = profilePhoto;
+            // await getIt<SecureStorageService>().saveToken(user.token);
+            //
+            // await getIt<SecureStorageService>().saveRole(user.role);
+
+
+            if (!context.mounted) return;
+
 
             Navigator.pushReplacementNamed(
               context,
@@ -758,12 +768,20 @@ class _RegisterHandymanTabletBodyState
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
         state.whenOrNull(
-          success: (user) {
+          success: (user) async {
             AppSnackBar.show(
               context,
               message: l10n.handymanSuccessMessage,
               type: AppSnackType.success,
             );
+
+            // await getIt<SecureStorageService>()
+            // .saveToken(user.token);
+            //
+            // await getIt<SecureStorageService>()
+            //     .saveRole(user.role);
+
+            if (!context.mounted) return;
 
             Navigator.pushReplacementNamed(
               context,

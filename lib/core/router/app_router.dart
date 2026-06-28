@@ -20,8 +20,8 @@ import '../../features/auth/presentation/views/splash_view.dart';
 import '../../features/customer/presentation/cubit/customer_cubit.dart';
 import '../../features/customer/presentation/views/customer_book_service_view.dart';
 import '../../features/customer/presentation/views/customer_category_search_results_view.dart';
-import '../../features/customer/presentation/views/customer_home_view.dart';
-import '../../features/customer/presentation/views/customer_notifications_view.dart';
+import '../../features/notifications/presentaions/cubit/notification_cubit.dart';
+import '../../features/notifications/presentaions/views/customer_notifications_view.dart';
 import '../../features/customer/presentation/views/customer_search_results_view.dart';
 import '../../features/customer/presentation/views/customer_settings_view.dart';
 import '../../features/customer/presentation/views/customer_shell.dart';
@@ -32,15 +32,17 @@ import '../../features/customer/presentation/views/customer_track_request_pendin
 import '../../features/customer/presentation/views/customer_view_handyman_portfolio_view.dart';
 import '../../features/customer/presentation/views/customer_view_handyman_reviews_view.dart';
 import '../../features/customer/presentation/views/customer_view_handyman_view.dart';
-import '../../features/handyman/ui/views/handyman_completed_jobs_view.dart';
-import '../../features/handyman/ui/views/handyman_manage_portfolio_view.dart';
-import '../../features/handyman/ui/views/handyman_new_request_view.dart';
-import '../../features/handyman/ui/views/handyman_notifications_view.dart';
-import '../../features/handyman/ui/views/handyman_own_reviews_view.dart';
-import '../../features/handyman/ui/views/handyman_settings_view.dart';
-import '../../features/handyman/ui/views/handyman_shell.dart';
-import '../../features/handyman/ui/views/handyman_update_job_status_view.dart';
-import '../../features/handyman/ui/views/handyman_view_active_job_view.dart';
+import '../../features/handyman/presentation/cubit/handyman_cubit.dart';
+import '../../features/handyman/presentation/views/handyman_completed_jobs_view.dart';
+import '../../features/handyman/presentation/views/handyman_edit_profile_view.dart';
+import '../../features/handyman/presentation/views/handyman_manage_portfolio_view.dart';
+import '../../features/handyman/presentation/views/handyman_new_request_view.dart';
+import '../../features/notifications/presentaions/views/handyman_notifications_view.dart';
+import '../../features/handyman/presentation/views/handyman_own_reviews_view.dart';
+import '../../features/handyman/presentation/views/handyman_settings_view.dart';
+import '../../features/handyman/presentation/views/handyman_shell.dart';
+import '../../features/handyman/presentation/views/handyman_update_job_status_view.dart';
+import '../../features/handyman/presentation/views/handyman_view_active_job_view.dart';
 import '../../features/home/shared/ui/views/shared_contact_us_view.dart';
 import '../../features/home/shared/ui/views/customer_edit_profile_view.dart';
 import '../../features/home/shared/ui/views/shared_faq_view.dart';
@@ -87,7 +89,7 @@ class AppRouter {
           settings: settings,
           child: BlocProvider(
             create: (_) => getIt<AuthCubit>(),
-            child: OtpView(email: args?['email']),
+            child: OtpView(email: args?['email'],sentOtp: args?['sentOtp'] as String?),
           ),
         );
 
@@ -150,16 +152,24 @@ class AppRouter {
           settings: settings,
           transition: _TransitionType.fade,
           child: MultiBlocProvider(
-              providers: [
-                BlocProvider(
-                  create: (_) => getIt<CustomerCubit>()
-                    ..getProfile()
-                    ..getStatistics(),
-                ),
+            providers: [
+              BlocProvider(
+                create: (_) => getIt<CustomerCubit>()
+                  ..getProfile()
+                  ..getStatistics(),
+              ),
 
-                BlocProvider(create: (_) => getIt<LookupCubit>()..loadCategories()),
-              ],
-              child: const CustomerShell()
+              BlocProvider(
+                create: (_) => getIt<LookupCubit>()
+                  ..loadCategories(),
+              ),
+
+              BlocProvider(
+                create: (_) => getIt<NotificationCubit>()
+                  ..getNotifications(),
+              ),
+            ],
+            child: const CustomerShell(),
           ),
         );
 
@@ -171,9 +181,15 @@ class AppRouter {
 
       case AppRoutes.customerViewHandyman:
         final handymanId = settings.arguments as String?;
+
         return _buildRoute(
           settings: settings,
-          child: CustomerViewHandymanView(handymanId: handymanId),
+          child: BlocProvider(
+            create: (_) => getIt<CustomerCubit>(),
+            child: CustomerViewHandymanView(
+              handymanId: handymanId,
+            ),
+          ),
         );
 
       case AppRoutes.customerBookService:
@@ -198,11 +214,17 @@ class AppRouter {
 
       case AppRoutes.customerSearchResults:
         final args = settings.arguments as Map<String, dynamic>?;
+        final searchQuery = args?['query'] as String?;
+        final searchCategoryId = args?['categoryId'] as String?;
         return _buildRoute(
           settings: settings,
-          child: CustomerSearchResultsView(
-            query: args?['query'] as String?,
-            categoryId: args?['categoryId'] as String?,
+          child: BlocProvider(
+            create: (_) => getIt<CustomerCubit>()
+              ..getHandymen(search: searchQuery, categoryId: searchCategoryId),
+            child: CustomerSearchResultsView(
+              query: searchQuery,
+              categoryId: searchCategoryId,
+            ),
           ),
         );
 
@@ -225,28 +247,40 @@ class AppRouter {
         final id = settings.arguments as String;
         return _buildRoute(
           settings: settings,
-          child: CustomerTrackRequestPendingView(requestId: id),
+          child: BlocProvider(
+            create: (_) => getIt<CustomerCubit>()..getRequestDetails(id),
+            child: CustomerTrackRequestPendingView(requestId: id),
+          ),
         );
 
       case AppRoutes.customerTrackRequestActive:
         final id = settings.arguments as String;
         return _buildRoute(
           settings: settings,
-          child: CustomerTrackRequestActiveView(requestId: id),
+          child: BlocProvider(
+            create: (_) => getIt<CustomerCubit>()..getRequestDetails(id),
+            child: CustomerTrackRequestActiveView(requestId: id),
+          ),
         );
 
       case AppRoutes.customerTrackRequestCompleted:
         final id = settings.arguments as String;
         return _buildRoute(
           settings: settings,
-          child: CustomerTrackRequestCompletedView(requestId: id),
+          child: BlocProvider(
+            create: (_) => getIt<CustomerCubit>()..getRequestDetails(id),
+            child: CustomerTrackRequestCompletedView(requestId: id),
+          ),
         );
 
       case AppRoutes.customerTrackRequestCancelled:
         final id = settings.arguments as String;
         return _buildRoute(
           settings: settings,
-          child: CustomerTrackRequestCancelledView(requestId: id),
+          child: BlocProvider(
+            create: (_) => getIt<CustomerCubit>()..getRequestDetails(id),
+            child: CustomerTrackRequestCancelledView(requestId: id),
+          ),
         );
 
       case AppRoutes.customerViewHandymanPortfolio:
@@ -260,19 +294,25 @@ class AppRouter {
         final handymanId = settings.arguments as String;
         return _buildRoute(
           settings: settings,
-          child: CustomerViewHandymanReviewsView(handymanId: handymanId),
+          child: BlocProvider(
+            create: (_) => getIt<CustomerCubit>()..getHandymanReviews(handymanId),
+            child: CustomerViewHandymanReviewsView(handymanId: handymanId),
+          ),
         );
 
       case AppRoutes.customerCategorySearchResults:
         final args = settings.arguments as Map<String, dynamic>;
+
         return _buildRoute(
           settings: settings,
-          child: CustomerCategorySearchResultsView(
-            categoryId: args['categoryId'] as String,
-            categoryName: args['categoryName'] as String,
+          child: BlocProvider(
+            create: (_) => getIt<CustomerCubit>(),
+            child: CustomerCategorySearchResultsView(
+              categoryId: args['categoryId'] as String,
+              categoryName: args['categoryName'] as String,
+            ),
           ),
         );
-
       // ── Handyman ──────────────────────────────────────────
 
       case AppRoutes.handymanHome:
@@ -290,10 +330,10 @@ class AppRouter {
         );
 
       case AppRoutes.handymanActiveJobs:
-        // TODO: replace with standalone HandymanActiveJobsView when built
+        final id = settings.arguments as String;
         return _buildRoute(
           settings: settings,
-          child: const HandymanViewActiveJobView(),
+          child: HandymanViewActiveJobView(requestId: id,),
         );
 
       case AppRoutes.handymanViewActiveJob:
@@ -324,26 +364,54 @@ class AppRouter {
       case AppRoutes.handymanManagePortfolio:
         return _buildRoute(
           settings: settings,
-          child: const HandymanManagePortfolioView(),
+          child: BlocProvider(
+            create: (_) => getIt<HandymanCubit>()..getPortfolio(),
+            child: const HandymanManagePortfolioView(),
+          ),
+        );
+
+      case AppRoutes.handymanEditProfileView:
+        return _buildRoute(
+          settings: settings,
+          child: BlocProvider(
+            create: (_) => getIt<HandymanCubit>()..getProfile(),
+            child: const HandymanEditProfileView(),
+          ),
         );
 
       case AppRoutes.handymanOwnReviews:
         return _buildRoute(
           settings: settings,
-          child: const HandymanOwnReviewsView(),
+          child: BlocProvider(
+            create: (_) => getIt<HandymanCubit>()
+              ..getReviews(),
+            child: const HandymanOwnReviewsView(),
+          ),
         );
 
       case AppRoutes.handymanUpdateJobStatus:
         final id = settings.arguments as String? ?? '';
+
         return _buildRoute(
           settings: settings,
-          child: HandymanUpdateJobStatusView(requestId: id),
+          child: BlocProvider.value(
+            value: getIt<HandymanCubit>(),
+            child: HandymanUpdateJobStatusView(
+              requestId: id,
+              customerName: '', serviceType: '', date: '', location: '', price: '',
+            ),
+          ),
         );
 
       case AppRoutes.handymanCompletedJobs:
         return _buildRoute(
           settings: settings,
-          child: const HandymanCompletedJobsView(),
+          child: BlocProvider(
+            create: (_) => getIt<HandymanCubit>()
+              ..getJobs()
+              ..getStatistics(),
+            child: const HandymanCompletedJobsView(),
+          ),
         );
 
       // ── Shared ────────────────────────────────────────────

@@ -2297,4 +2297,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get resetPasswordSuccessMessage => 'تم تغيير كلمة المرور بنجاح';
+
+  @override
+  String get startJobBtn => 'ابدء الوظيفه';
 }

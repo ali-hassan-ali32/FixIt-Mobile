@@ -1,9 +1,7 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
-
+import '../../domain/entities/lookup_item_entity.dart';
 import '../../domain/repositories/lookup_repository.dart';
-
 import 'lookup_state.dart';
 
 @injectable
@@ -13,21 +11,20 @@ class LookupCubit extends Cubit<LookupState> {
 
   LookupCubit(this.repository,) : super(const LookupState.initial(),);
 
+
+  List<LookupItemEntity> get categories {
+    if (state is LookupLoaded) {
+      return (state as LookupLoaded).categories;
+    }
+
+    return [];
+  }
+
   Future<void> loadCities() async {
 
     emit(const LookupState.loading(),);
 
     final cities = await repository.getCities();
-
-    debugPrint(
-      'Cities Count = ${cities.length}',
-    );
-
-    for (final city in cities) {
-      debugPrint(
-        'City => ${city.id} | ${city.name}',
-      );
-    }
 
     emit(
       LookupState.loaded(
@@ -50,16 +47,6 @@ class LookupCubit extends Cubit<LookupState> {
 
     final categories =
     await repository.getCategories();
-
-    debugPrint(
-      'Categories Count = ${categories.length}',
-    );
-
-    for (final category in categories) {
-      debugPrint(
-        'Category => ${category.id} | ${category.name}',
-      );
-    }
 
     if (state is LookupLoaded) {
 

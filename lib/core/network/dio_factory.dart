@@ -3,6 +3,7 @@ import 'package:injectable/injectable.dart';
 
 import '../../features/auth/api/services/auth_api_service.dart';
 import '../../features/customer/api/services/customer_api_service.dart';
+import '../../features/handyman/api/services/handyman_api_service.dart';
 import '../../features/lookups/api/services/lookup_api_service.dart';
 import 'api_constants.dart';
 import 'auth_interceptor.dart';
@@ -42,4 +43,7 @@ class DioFactory {
 
   @lazySingleton
   CustomerApiService customerApiService(Dio dio,) => CustomerApiService(dio);
+
+  @lazySingleton
+  HandymanApiService handymanApiService(Dio dio,) => HandymanApiService(dio);
 }

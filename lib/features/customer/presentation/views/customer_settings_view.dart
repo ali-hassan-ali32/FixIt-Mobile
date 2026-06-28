@@ -8,6 +8,7 @@ import '../../../../config/providers/app_config_provider.dart';
 import '../../../../core/l10n/translation/app_localizations.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_sizes.dart';
+import '../../../../core/utils/functions/remeber_me.dart';
 import '../../../../core/utils/widgets/app_main_background.dart';
 import '../../../../core/utils/widgets/animations/animated_confirm_dialog.dart';
 import '../../../../core/utils/widgets/app_page_header.dart';
@@ -41,6 +42,7 @@ abstract class _SettingsBase<T extends StatefulWidget> extends State<T>
   late final AnimationController entryCtrl;
   late final List<Animation<double>> entryFade;
   late final List<Animation<Offset>> entrySlide;
+  bool rememberMeEnabled = false;
   static const _n = 5;
 
   @override
@@ -76,6 +78,14 @@ abstract class _SettingsBase<T extends StatefulWidget> extends State<T>
       );
     });
     entryCtrl.forward();
+
+    Future.microtask(() async {
+      rememberMeEnabled = await getRememberMe();
+
+      if (mounted) {
+        setState(() {});
+      }
+    });
   }
 
   @override
@@ -114,26 +124,6 @@ abstract class _SettingsBase<T extends StatefulWidget> extends State<T>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // ── Account ──────────────────────────────────────
-        ea(
-          0,
-          AppSettingsSection(
-            title: l10n.settingsSectionAccount,
-            isDark: isDark,
-            children: [
-              AppSettingsItem(
-                icon: Icons.lock_outline_rounded,
-                iconBgColor: const Color(0xFFE0F2FE),
-                iconColor: const Color(0xFF0284C7),
-                label: l10n.settingsChangePassword,
-                isDark: isDark,
-                onTap: () =>
-                    AppSnackBar.show(context, message: l10n.comingSoon),
-              ),
-            ],
-          ),
-        ),
-        SizedBox(height: 4.h),
 
         // ── Preferences ──────────────────────────────────
         ea(
@@ -164,9 +154,44 @@ abstract class _SettingsBase<T extends StatefulWidget> extends State<T>
         ),
         SizedBox(height: 4.h),
 
-        // ── Appearance ───────────────────────────────────
         ea(
           2,
+            AppSettingsItem(
+              icon: Icons.lock_clock_outlined,
+              iconBgColor: const Color(0xFFEFF6FF),
+              iconColor: const Color(0xFF2563EB),
+              label: 'تذكرني',
+              subtitle: 'ابقيني متصلا',
+              isDark: isDark,
+              showChevron: false,
+              trailing: _AnimatedSwitch(
+                value: rememberMeEnabled,
+                activeColor: accent,
+                onChanged: (v) async {
+
+                  HapticFeedback.selectionClick();
+
+                  await setRememberMe(v);
+
+                  setState(() {
+                    rememberMeEnabled = v;
+                  });
+
+                  AppSnackBar.show(
+                    context,
+                    message: v
+                        ? 'Remember Me Enabled'
+                        : 'Remember Me Disabled',
+                  );
+                },
+              ),
+            ),
+        ),
+        SizedBox(height: 4.h),
+
+        // ── Appearance ───────────────────────────────────
+        ea(
+          3,
           AppSettingsSection(
             title: l10n.settingsSectionAppearance,
             isDark: isDark,
@@ -222,7 +247,7 @@ abstract class _SettingsBase<T extends StatefulWidget> extends State<T>
 
         // ── Legal ─────────────────────────────────────────
         ea(
-          3,
+          4,
           AppSettingsSection(
             title: l10n.settingsSectionLegal,
             isDark: isDark,
@@ -251,14 +276,14 @@ abstract class _SettingsBase<T extends StatefulWidget> extends State<T>
         SizedBox(height: 20.h),
 
         // ── Danger ────────────────────────────────────────
-        ea(
-          4,
-          AppSettingsDangerButton(
-            label: l10n.settingsDeleteAccount,
-            icon: Icons.delete_outline_rounded,
-            onTap: () => onDeleteAccount(l10n),
-          ),
-        ),
+        // ea(
+        //   5,
+        //   AppSettingsDangerButton(
+        //     label: l10n.settingsDeleteAccount,
+        //     icon: Icons.delete_outline_rounded,
+        //     onTap: () => onDeleteAccount(l10n),
+        //   ),
+        // ),
       ],
     );
   }

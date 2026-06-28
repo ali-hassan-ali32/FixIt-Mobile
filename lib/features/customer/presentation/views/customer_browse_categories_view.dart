@@ -1,101 +1,106 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/l10n/translation/app_localizations.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_sizes.dart';
+import '../../../../core/utils/functions/category_icon_mapper.dart';
 import '../../../../core/utils/widgets/app_main_background.dart';
 import '../../../../core/utils/widgets/app_empty_states.dart';
 import '../../../../core/utils/widgets/app_search_bar.dart';
+import '../../../lookups/domain/entities/lookup_item_entity.dart';
+import '../../../lookups/presentation/cubit/lookup_cubit.dart';
+import '../../../lookups/presentation/cubit/lookup_state.dart';
 
 // ── Model ─────────────────────────────────────────────────────
-class CategoryModel {
-  final String name;
-  final IconData icon;
-  final int technicianCount;
+// class CategoryModel {
+//   final String name;
+//   final IconData icon;
+//   final int technicianCount;
+//
+//   const CategoryModel({
+//     required this.name,
+//     required this.icon,
+//     required this.technicianCount,
+//   });
+// }
 
-  const CategoryModel({
-    required this.name,
-    required this.icon,
-    required this.technicianCount,
-  });
-}
-
-final _kAllCategories = [
-  CategoryModel(name: 'كهرباء', icon: Icons.bolt_rounded, technicianCount: 45),
-  CategoryModel(
-    name: 'سباكة',
-    icon: Icons.water_drop_outlined,
-    technicianCount: 38,
-  ),
-  CategoryModel(
-    name: 'نجارة',
-    icon: Icons.handyman_outlined,
-    technicianCount: 26,
-  ),
-  CategoryModel(
-    name: 'دهانات',
-    icon: Icons.format_paint_outlined,
-    technicianCount: 35,
-  ),
-  CategoryModel(
-    name: 'تكييفات',
-    icon: Icons.ac_unit_rounded,
-    technicianCount: 30,
-  ),
-  CategoryModel(
-    name: 'تبريد وتجميد',
-    icon: Icons.kitchen_outlined,
-    technicianCount: 18,
-  ),
-  CategoryModel(
-    name: 'سيراميك',
-    icon: Icons.grid_view_rounded,
-    technicianCount: 22,
-  ),
-  CategoryModel(name: 'حدائق', icon: Icons.park_outlined, technicianCount: 18),
-  CategoryModel(
-    name: 'أجهزة منزلية',
-    icon: Icons.tv_outlined,
-    technicianCount: 42,
-  ),
-  CategoryModel(
-    name: 'تنظيف',
-    icon: Icons.cleaning_services_outlined,
-    technicianCount: 50,
-  ),
-  CategoryModel(
-    name: 'نقل وتخزين',
-    icon: Icons.local_shipping_outlined,
-    technicianCount: 15,
-  ),
-  CategoryModel(
-    name: 'كاميرات مراقبة',
-    icon: Icons.camera_outdoor_outlined,
-    technicianCount: 20,
-  ),
-  CategoryModel(
-    name: 'صيانة عامة',
-    icon: Icons.build_outlined,
-    technicianCount: 65,
-  ),
-  CategoryModel(
-    name: 'عزل مائي',
-    icon: Icons.water_outlined,
-    technicianCount: 14,
-  ),
-  CategoryModel(
-    name: 'جبس وديكور',
-    icon: Icons.architecture_outlined,
-    technicianCount: 28,
-  ),
-  CategoryModel(
-    name: 'حدادة وألمنيوم',
-    icon: Icons.construction_outlined,
-    technicianCount: 16,
-  ),
-];
+// final _kAllCategories = [
+//   CategoryModel(name: 'كهرباء', icon: Icons.bolt_rounded, technicianCount: 45),
+//   CategoryModel(
+//     name: 'سباكة',
+//     icon: Icons.water_drop_outlined,
+//     technicianCount: 38,
+//   ),
+//   CategoryModel(
+//     name: 'نجارة',
+//     icon: Icons.handyman_outlined,
+//     technicianCount: 26,
+//   ),
+//   CategoryModel(
+//     name: 'دهانات',
+//     icon: Icons.format_paint_outlined,
+//     technicianCount: 35,
+//   ),
+//   CategoryModel(
+//     name: 'تكييفات',
+//     icon: Icons.ac_unit_rounded,
+//     technicianCount: 30,
+//   ),
+//   CategoryModel(
+//     name: 'تبريد وتجميد',
+//     icon: Icons.kitchen_outlined,
+//     technicianCount: 18,
+//   ),
+//   CategoryModel(
+//     name: 'سيراميك',
+//     icon: Icons.grid_view_rounded,
+//     technicianCount: 22,
+//   ),
+//   CategoryModel(name: 'حدائق', icon: Icons.park_outlined, technicianCount: 18),
+//   CategoryModel(
+//     name: 'أجهزة منزلية',
+//     icon: Icons.tv_outlined,
+//     technicianCount: 42,
+//   ),
+//   CategoryModel(
+//     name: 'تنظيف',
+//     icon: Icons.cleaning_services_outlined,
+//     technicianCount: 50,
+//   ),
+//   CategoryModel(
+//     name: 'نقل وتخزين',
+//     icon: Icons.local_shipping_outlined,
+//     technicianCount: 15,
+//   ),
+//   CategoryModel(
+//     name: 'كاميرات مراقبة',
+//     icon: Icons.camera_outdoor_outlined,
+//     technicianCount: 20,
+//   ),
+//   CategoryModel(
+//     name: 'صيانة عامة',
+//     icon: Icons.build_outlined,
+//     technicianCount: 65,
+//   ),
+//   CategoryModel(
+//     name: 'عزل مائي',
+//     icon: Icons.water_outlined,
+//     technicianCount: 14,
+//   ),
+//   CategoryModel(
+//     name: 'جبس وديكور',
+//     icon: Icons.architecture_outlined,
+//     technicianCount: 28,
+//   ),
+//   CategoryModel(
+//     name: 'حدادة وألمنيوم',
+//     icon: Icons.construction_outlined,
+//     technicianCount: 16,
+//   ),
+// ];
 
 const _kPopularCount = 8;
 
@@ -153,15 +158,22 @@ abstract class _BrowseBase<T extends StatefulWidget> extends State<T>
     super.dispose();
   }
 
-  List<CategoryModel> get visible {
+  List<LookupItemEntity> visible(
+      List<LookupItemEntity> categories,
+      ) {
     if (searchQuery.isNotEmpty) {
-      return _kAllCategories
-          .where((c) => c.name.contains(searchQuery))
+      return categories
+          .where(
+            (e) => e.name.toLowerCase().contains(
+          searchQuery.toLowerCase(),
+        ),
+      )
           .toList();
     }
+
     return showingAll
-        ? _kAllCategories
-        : _kAllCategories.take(_kPopularCount).toList();
+        ? categories
+        : categories.take(_kPopularCount).toList();
   }
 
   void onSearchChanged(String q) => setState(() => searchQuery = q.trim());
@@ -177,10 +189,16 @@ abstract class _BrowseBase<T extends StatefulWidget> extends State<T>
     searchQuery = '';
   });
 
-  void navigate(BuildContext context, CategoryModel cat) {
+  void navigate(
+      BuildContext context,
+      LookupItemEntity cat,
+      ) {
     Navigator.of(context).pushNamed(
       AppRoutes.customerCategorySearchResults,
-      arguments: {'categoryId': cat.name, 'categoryName': cat.name},
+      arguments: {
+        'categoryId': cat.id,
+        'categoryName': cat.name,
+      },
     );
   }
 
@@ -282,69 +300,130 @@ class _CustomerBrowseCategoriesMobileBodyState
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context)!;
-    final cats = visible;
+    return BlocBuilder<LookupCubit, LookupState>(
+      builder: (context, state) {
+        final cubit = context.read<LookupCubit>();
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: AppMainBackground(
-        child: CustomScrollView(
-          slivers: [
-            SliverToBoxAdapter(child: buildHeader(context, isDark, l10n)),
+        final cats = visible(
+          cubit.categories,
+        );
 
-            if (cats.isEmpty)
-              SliverFillRemaining(
-                child: Center(
-                  child: AppEmptyState(
-                    icon: Icons.search_off_rounded,
-                    title: l10n.browseEmptyTitle,
-                    subtitle: l10n.browseEmptySubtitle,
-                    color: accent,
-                    actionLabel: l10n.browseClearSearch,
-                    onAction: clearSearch,
-                  ),
-                ),
-              )
-            else ...[
-              SliverToBoxAdapter(child: buildSectionHeader(context, l10n)),
-              SliverPadding(
-                padding: EdgeInsets.fromLTRB(
-                  AppSpacing.xl.w,
-                  0,
-                  AppSpacing.xl.w,
-                  AppSpacing.xxl.h,
-                ),
-                sliver: SliverGrid(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 14.h,
-                    crossAxisSpacing: 14.w,
-                    childAspectRatio: 1.3,
-                  ),
-                  delegate: SliverChildBuilderDelegate(
-                    (_, i) => _CategoryCard(
-                      category: cats[i],
-                      index: i,
-                      isDark: isDark,
-                      technicianLabel: l10n.browseTechnicianCount,
-                      accentColor: accent,
-                      onTap: () => navigate(context, cats[i]),
-                    ),
-                    childCount: cats.length,
-                  ),
-                ),
-              ),
-            ],
+        if (state is LookupLoading &&
+            cubit.categories.isEmpty) {
+          return const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
 
-            SliverToBoxAdapter(
-              child: SizedBox(
-                height: MediaQuery.of(context).padding.bottom + 100.h,
+        if (state is LookupError &&
+            cubit.categories.isEmpty) {
+          return Scaffold(
+            body: Center(
+              child: AppEmptyState(
+                icon: Icons.error_outline_rounded,
+                title: 'Something went wrong',
+                subtitle: state.message,
+                color: accent,
               ),
             ),
-          ],
-        ),
-      ),
-    );
-  }
+          );
+        }
+
+        if (cubit.categories.isEmpty) {
+          return Scaffold(
+            body: Center(
+              child: AppEmptyState(
+                icon: Icons.category_outlined,
+                title: l10n.browseEmptyTitle,
+                subtitle: l10n.browseEmptySubtitle,
+                color: accent,
+              ),
+            ),
+          );
+        }
+
+        return Scaffold(
+          backgroundColor: Colors.transparent,
+          body: AppMainBackground(
+            child: CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(
+                  child: buildHeader(
+                    context,
+                    isDark,
+                    l10n,
+                  ),
+                ),
+
+                if (cats.isEmpty)
+                  SliverFillRemaining(
+                    child: Center(
+                      child: AppEmptyState(
+                        icon: Icons.search_off_rounded,
+                        title: l10n.browseEmptyTitle,
+                        subtitle: l10n.browseEmptySubtitle,
+                        color: accent,
+                        actionLabel: l10n.browseClearSearch,
+                        onAction: clearSearch,
+                      ),
+                    ),
+                  )
+                else ...[
+                  SliverToBoxAdapter(
+                    child: buildSectionHeader(
+                      context,
+                      l10n,
+                    ),
+                  ),
+                  SliverPadding(
+                    padding: EdgeInsets.fromLTRB(
+                      AppSpacing.xl.w,
+                      0,
+                      AppSpacing.xl.w,
+                      AppSpacing.xxl.h,
+                    ),
+                    sliver: SliverGrid(
+                      gridDelegate:
+                      SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 14.h,
+                        crossAxisSpacing: 14.w,
+                        childAspectRatio: 1.3,
+                      ),
+                      delegate: SliverChildBuilderDelegate(
+                            (_, i) => _CategoryCard(
+                          category: cats[i],
+                          index: i,
+                          isDark: isDark,
+                          technicianLabel:
+                          l10n.browseTechnicianCount,
+                          accentColor: accent,
+                          onTap: () => navigate(
+                            context,
+                            cats[i],
+                          ),
+                        ),
+                        childCount: cats.length,
+                      ),
+                    ),
+                  ),
+                ],
+
+                SliverToBoxAdapter(
+                  child: SizedBox(
+                    height:
+                    MediaQuery.of(context).padding.bottom +
+                        100.h,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );  }
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -364,64 +443,73 @@ class _CustomerBrowseCategoriesTabletBodyState
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context)!;
-    final cats = visible;
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: AppMainBackground(
-        child: CustomScrollView(
-          slivers: [
-            SliverToBoxAdapter(child: buildHeader(context, isDark, l10n)),
+    return BlocBuilder<LookupCubit, LookupState>(
+        builder: (context, state) {
+          final cubit = context.read<LookupCubit>();
 
-            if (cats.isEmpty)
-              SliverFillRemaining(
-                child: Center(
-                  child: AppEmptyState(
-                    icon: Icons.search_off_rounded,
-                    title: l10n.browseEmptyTitle,
-                    subtitle: l10n.browseEmptySubtitle,
-                    color: accent,
-                    actionLabel: l10n.browseClearSearch,
-                    onAction: clearSearch,
-                  ),
-                ),
-              )
-            else ...[
-              SliverToBoxAdapter(child: buildSectionHeader(context, l10n)),
-              // 3 columns on tablet
-              SliverPadding(
-                padding: EdgeInsets.fromLTRB(
-                  AppSpacing.xl.w,
-                  0,
-                  AppSpacing.xl.w,
-                  AppSpacing.xxl.h,
-                ),
-                sliver: SliverGrid(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    mainAxisSpacing: 16.h,
-                    crossAxisSpacing: 16.w,
-                    childAspectRatio: 1.35,
-                  ),
-                  delegate: SliverChildBuilderDelegate(
-                    (_, i) => _CategoryCard(
-                      category: cats[i],
-                      index: i,
-                      isDark: isDark,
-                      technicianLabel: l10n.browseTechnicianCount,
-                      accentColor: accent,
-                      onTap: () => navigate(context, cats[i]),
+          final cats = visible(
+            cubit.categories,
+          );
+
+          return Scaffold(
+            backgroundColor: Colors.transparent,
+            body: AppMainBackground(
+              child: CustomScrollView(
+                slivers: [
+                  SliverToBoxAdapter(child: buildHeader(context, isDark, l10n)),
+
+                  if (cats.isEmpty)
+                    SliverFillRemaining(
+                      child: Center(
+                        child: AppEmptyState(
+                          icon: Icons.search_off_rounded,
+                          title: l10n.browseEmptyTitle,
+                          subtitle: l10n.browseEmptySubtitle,
+                          color: accent,
+                          actionLabel: l10n.browseClearSearch,
+                          onAction: clearSearch,
+                        ),
+                      ),
+                    )
+                  else ...[
+                    SliverToBoxAdapter(child: buildSectionHeader(context, l10n)),
+                    // 3 columns on tablet
+                    SliverPadding(
+                      padding: EdgeInsets.fromLTRB(
+                        AppSpacing.xl.w,
+                        0,
+                        AppSpacing.xl.w,
+                        AppSpacing.xxl.h,
+                      ),
+                      sliver: SliverGrid(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          mainAxisSpacing: 16.h,
+                          crossAxisSpacing: 16.w,
+                          childAspectRatio: 1.35,
+                        ),
+                        delegate: SliverChildBuilderDelegate(
+                              (_, i) => _CategoryCard(
+                            category: cats[i],
+                            index: i,
+                            isDark: isDark,
+                            technicianLabel: l10n.browseTechnicianCount,
+                            accentColor: accent,
+                            onTap: () => navigate(context, cats[i]),
+                          ),
+                          childCount: cats.length,
+                        ),
+                      ),
                     ),
-                    childCount: cats.length,
-                  ),
-                ),
-              ),
-            ],
+                  ],
 
-            SliverToBoxAdapter(child: SizedBox(height: 32.h)),
-          ],
-        ),
-      ),
+                  SliverToBoxAdapter(child: SizedBox(height: 32.h)),
+                ],
+              ),
+            ),
+          );
+        },
     );
   }
 }
@@ -430,7 +518,7 @@ class _CustomerBrowseCategoriesTabletBodyState
 // _CategoryCard — entry pop + glow pulse + press scale
 // ══════════════════════════════════════════════════════════════
 class _CategoryCard extends StatefulWidget {
-  final CategoryModel category;
+  final LookupItemEntity category;
   final int index;
   final bool isDark;
   final String technicianLabel;
@@ -573,7 +661,9 @@ class _CategoryCardState extends State<_CategoryCard>
                       borderRadius: BorderRadius.all(AppRadius.md),
                     ),
                     child: Icon(
-                      widget.category.icon,
+                      CategoryIconMapper.iconOf(
+                        widget.category.icon,
+                      ),
                       size: 20.sp,
                       color: widget.accentColor,
                     ),
@@ -590,7 +680,7 @@ class _CategoryCardState extends State<_CategoryCard>
                   ),
                   SizedBox(height: 2.h),
                   Text(
-                    '${widget.category.technicianCount} ${widget.technicianLabel}',
+                    widget.technicianLabel,
                     style: TextStyle(
                       fontSize: 9.5.sp,
                       color: colorScheme.onSurfaceVariant,

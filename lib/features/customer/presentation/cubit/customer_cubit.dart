@@ -1,8 +1,20 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 
+import '../../data/models/requests/review_request.dart';
 import '../../domain/entities/customer_profile_entity.dart';
 import '../../domain/entities/customer_statistics_entity.dart';
+import '../../domain/entities/handyman_details_entity.dart';
+import '../../domain/entities/handyman_list_entity.dart';
+import '../../domain/entities/portfolio_item_entity.dart';
+import '../../domain/entities/review_entity.dart';
+import '../../domain/usecases/add_review_usecase.dart';
+import '../../domain/usecases/get_featured_handymen_usecase.dart';
+import '../../domain/usecases/get_handyman_details_usecase.dart';
+import '../../domain/usecases/get_handyman_portfolio_usecase.dart';
+import '../../domain/usecases/get_handyman_reviews_usecase.dart';
+import '../../domain/usecases/get_handymen_usecase.dart';
+import '../../domain/usecases/get_my_reviews_usecase.dart';
 import 'customer_state.dart';
 
 import '../../data/models/requests/create_service_request.dart';
@@ -40,10 +52,46 @@ class CustomerCubit
   final GetStatisticsUseCase
   _getStatisticsUseCase;
 
-  CustomerProfileEntity? profileData;
+  final GetHandymenUseCase
+  _getHandymenUseCase;
+
+  final GetFeaturedHandymenUseCase
+  _getFeaturedHandymenUseCase;
+
+  final GetHandymanDetailsUseCase
+  _getHandymanDetailsUseCase;
+
+  final GetHandymanPortfolioUseCase
+  _getHandymanPortfolioUseCase;
+
+  final GetHandymanReviewsUseCase
+  _getHandymanReviewsUseCase;
+
+  final AddReviewUseCase
+  _addReviewUseCase;
+
+  final GetMyReviewsUseCase
+  _getMyReviewsUseCase;
+
+  List<ReviewEntity> handymanReviews = [];
+
+  List<ReviewEntity> myReviews = [];
+
+  CustomerProfileEntity? customerProfileData;
   CustomerStatisticsEntity? statisticsData;
 
+  List<HandymanListEntity> handymen = [];
+
+  List<HandymanListEntity> featuredHandymen = [];
+
+  HandymanDetailsEntity?handymanDetails;
+
+  List<PortfolioItemEntity> portfolio = [];
+
   CustomerCubit(
+      this._getHandymanReviewsUseCase,
+      this._addReviewUseCase,
+      this._getMyReviewsUseCase,
       this._getProfileUseCase,
       this._updateProfileUseCase,
       this._getRequestsUseCase,
@@ -51,9 +99,202 @@ class CustomerCubit
       this._getRequestDetailsUseCase,
       this._cancelRequestUseCase,
       this._getStatisticsUseCase,
+      this._getHandymenUseCase,
+      this._getFeaturedHandymenUseCase,
+      this._getHandymanDetailsUseCase,
+      this._getHandymanPortfolioUseCase,
       ) : super(
     const CustomerState.initial(),
   );
+
+
+  Future<void> getMyReviews() async {
+    emit(const CustomerState.loading());
+
+    final result =
+    await _getMyReviewsUseCase();
+
+    result.fold(
+          (failure) => emit(
+        CustomerState.error(
+          failure.message,
+        ),
+      ),
+          (reviews) {
+        myReviews = reviews;
+
+        emit(
+          CustomerState.myReviewsLoaded(
+            reviews,
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> addReview(
+      String requestId,
+      ReviewRequest request,
+      ) async {
+    emit(const CustomerState.loading());
+
+    final result =
+    await _addReviewUseCase(
+      requestId,
+      request,
+    );
+
+    result.fold(
+          (failure) => emit(
+        CustomerState.error(
+          failure.message,
+        ),
+      ),
+          (_) => emit(
+        const CustomerState.message(
+          'Review added successfully.',
+        ),
+      ),
+    );
+  }
+
+  Future<void> getHandymanReviews(
+      String handymanId,
+      ) async {
+    emit(const CustomerState.loading());
+
+    final result =
+    await _getHandymanReviewsUseCase(
+      handymanId,
+    );
+
+    result.fold(
+          (failure) => emit(
+        CustomerState.error(
+          failure.message,
+        ),
+      ),
+          (reviews) {
+        handymanReviews = reviews;
+
+        emit(
+          CustomerState.handymanReviewsLoaded(
+            reviews,
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> getHandymanPortfolio(
+      String handymanId,
+      ) async {
+    emit(const CustomerState.loading());
+
+    final result =
+    await _getHandymanPortfolioUseCase(
+      handymanId,
+    );
+
+    result.fold(
+          (failure) => emit(
+        CustomerState.error(
+          failure.message,
+        ),
+      ),
+          (data) {
+        portfolio = data;
+
+        emit(
+          CustomerState
+              .portfolioLoaded(
+            data,
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> getHandymanDetails(
+      String handymanId,
+      ) async {
+    emit(const CustomerState.loading());
+
+    final result =
+    await _getHandymanDetailsUseCase(
+      handymanId,
+    );
+
+    result.fold(
+          (failure) => emit(
+        CustomerState.error(
+          failure.message,
+        ),
+      ),
+          (data) {
+        handymanDetails = data;
+
+        emit(
+          CustomerState
+              .handymanDetailsLoaded(
+            data,
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> getFeaturedHandymen() async {
+    emit(const CustomerState.loading());
+
+    final result =
+    await _getFeaturedHandymenUseCase();
+
+    result.fold(
+          (failure) => emit(
+        CustomerState.error(
+          failure.message,
+        ),
+      ),
+          (data) {
+        featuredHandymen = data;
+
+        emit(
+          CustomerState
+              .featuredHandymenLoaded(
+            data,
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> getHandymen({
+    String? search,
+    String? categoryId,
+    bool? availableOnly,
+  }) async {
+    emit(const CustomerState.loading());
+    print('Loading emitted');
+
+    final result = await _getHandymenUseCase(
+      search: search,
+      categoryId: categoryId,
+      availableOnly: availableOnly,
+    );
+
+    result.fold(
+          (failure) {
+        print('Failure emitted');
+        emit(CustomerError(failure.message));
+      },
+          (data) {
+        handymen = data;
+        print('Loaded emitted: ${handymen.length}');
+        emit(CustomerHandymenLoaded(data));
+      },
+    );
+  }
 
   Future<void> getProfile() async {
     emit(
@@ -69,7 +310,7 @@ class CustomerCubit
         ),
       ),
           (profile) {
-            profileData = profile;
+            customerProfileData = profile;
             emit(CustomerState.profileLoaded(profile,));
           },
     );
@@ -120,9 +361,7 @@ class CustomerCubit
     );
   }
 
-  Future<void> createRequest(
-      CreateServiceRequest request,
-      ) async {
+  Future<void> createRequest(CreateServiceRequest request,) async {
     emit(
       const CustomerState.loading(),
     );
@@ -146,9 +385,7 @@ class CustomerCubit
     );
   }
 
-  Future<void> getRequestDetails(
-      String requestId,
-      ) async {
+  Future<void> getRequestDetails(String requestId,) async {
     emit(
       const CustomerState.loading(),
     );
@@ -173,9 +410,7 @@ class CustomerCubit
     );
   }
 
-  Future<void> cancelRequest(
-      String requestId,
-      ) async {
+  Future<void> cancelRequest(String requestId,) async {
     emit(
       const CustomerState.loading(),
     );

@@ -55,7 +55,7 @@ extension AuthStatePatterns on AuthState {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( AuthInitial value)?  initial,TResult Function( AuthLoading value)?  loading,TResult Function( AuthSuccess value)?  success,TResult Function( AuthMessage value)?  message,TResult Function( AuthError value)?  error,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( AuthInitial value)?  initial,TResult Function( AuthLoading value)?  loading,TResult Function( AuthSuccess value)?  success,TResult Function( AuthMessage value)?  message,TResult Function( AuthError value)?  error,TResult Function( ForgotPasswordSuccess value)?  forgotPasswordSuccess,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case AuthInitial() when initial != null:
@@ -63,7 +63,8 @@ return initial(_that);case AuthLoading() when loading != null:
 return loading(_that);case AuthSuccess() when success != null:
 return success(_that);case AuthMessage() when message != null:
 return message(_that);case AuthError() when error != null:
-return error(_that);case _:
+return error(_that);case ForgotPasswordSuccess() when forgotPasswordSuccess != null:
+return forgotPasswordSuccess(_that);case _:
   return orElse();
 
 }
@@ -81,7 +82,7 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( AuthInitial value)  initial,required TResult Function( AuthLoading value)  loading,required TResult Function( AuthSuccess value)  success,required TResult Function( AuthMessage value)  message,required TResult Function( AuthError value)  error,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( AuthInitial value)  initial,required TResult Function( AuthLoading value)  loading,required TResult Function( AuthSuccess value)  success,required TResult Function( AuthMessage value)  message,required TResult Function( AuthError value)  error,required TResult Function( ForgotPasswordSuccess value)  forgotPasswordSuccess,}){
 final _that = this;
 switch (_that) {
 case AuthInitial():
@@ -89,7 +90,8 @@ return initial(_that);case AuthLoading():
 return loading(_that);case AuthSuccess():
 return success(_that);case AuthMessage():
 return message(_that);case AuthError():
-return error(_that);case _:
+return error(_that);case ForgotPasswordSuccess():
+return forgotPasswordSuccess(_that);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -106,7 +108,7 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( AuthInitial value)?  initial,TResult? Function( AuthLoading value)?  loading,TResult? Function( AuthSuccess value)?  success,TResult? Function( AuthMessage value)?  message,TResult? Function( AuthError value)?  error,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( AuthInitial value)?  initial,TResult? Function( AuthLoading value)?  loading,TResult? Function( AuthSuccess value)?  success,TResult? Function( AuthMessage value)?  message,TResult? Function( AuthError value)?  error,TResult? Function( ForgotPasswordSuccess value)?  forgotPasswordSuccess,}){
 final _that = this;
 switch (_that) {
 case AuthInitial() when initial != null:
@@ -114,7 +116,8 @@ return initial(_that);case AuthLoading() when loading != null:
 return loading(_that);case AuthSuccess() when success != null:
 return success(_that);case AuthMessage() when message != null:
 return message(_that);case AuthError() when error != null:
-return error(_that);case _:
+return error(_that);case ForgotPasswordSuccess() when forgotPasswordSuccess != null:
+return forgotPasswordSuccess(_that);case _:
   return null;
 
 }
@@ -131,14 +134,15 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( AuthUser user)?  success,TResult Function( String message)?  message,TResult Function( String message)?  error,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( AuthUser user)?  success,TResult Function( String message)?  message,TResult Function( String message)?  error,TResult Function( String message,  String? token)?  forgotPasswordSuccess,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case AuthInitial() when initial != null:
 return initial();case AuthLoading() when loading != null:
 return loading();case AuthSuccess() when success != null:
 return success(_that.user);case AuthMessage() when message != null:
 return message(_that.message);case AuthError() when error != null:
-return error(_that.message);case _:
+return error(_that.message);case ForgotPasswordSuccess() when forgotPasswordSuccess != null:
+return forgotPasswordSuccess(_that.message,_that.token);case _:
   return orElse();
 
 }
@@ -156,14 +160,15 @@ return error(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( AuthUser user)  success,required TResult Function( String message)  message,required TResult Function( String message)  error,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( AuthUser user)  success,required TResult Function( String message)  message,required TResult Function( String message)  error,required TResult Function( String message,  String? token)  forgotPasswordSuccess,}) {final _that = this;
 switch (_that) {
 case AuthInitial():
 return initial();case AuthLoading():
 return loading();case AuthSuccess():
 return success(_that.user);case AuthMessage():
 return message(_that.message);case AuthError():
-return error(_that.message);case _:
+return error(_that.message);case ForgotPasswordSuccess():
+return forgotPasswordSuccess(_that.message,_that.token);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -180,14 +185,15 @@ return error(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( AuthUser user)?  success,TResult? Function( String message)?  message,TResult? Function( String message)?  error,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( AuthUser user)?  success,TResult? Function( String message)?  message,TResult? Function( String message)?  error,TResult? Function( String message,  String? token)?  forgotPasswordSuccess,}) {final _that = this;
 switch (_that) {
 case AuthInitial() when initial != null:
 return initial();case AuthLoading() when loading != null:
 return loading();case AuthSuccess() when success != null:
 return success(_that.user);case AuthMessage() when message != null:
 return message(_that.message);case AuthError() when error != null:
-return error(_that.message);case _:
+return error(_that.message);case ForgotPasswordSuccess() when forgotPasswordSuccess != null:
+return forgotPasswordSuccess(_that.message,_that.token);case _:
   return null;
 
 }
@@ -451,6 +457,74 @@ class _$AuthErrorCopyWithImpl<$Res>
   return _then(AuthError(
 null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
 as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class ForgotPasswordSuccess implements AuthState {
+  const ForgotPasswordSuccess(this.message, this.token);
+  
+
+ final  String message;
+ final  String? token;
+
+/// Create a copy of AuthState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ForgotPasswordSuccessCopyWith<ForgotPasswordSuccess> get copyWith => _$ForgotPasswordSuccessCopyWithImpl<ForgotPasswordSuccess>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ForgotPasswordSuccess&&(identical(other.message, message) || other.message == message)&&(identical(other.token, token) || other.token == token));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,message,token);
+
+@override
+String toString() {
+  return 'AuthState.forgotPasswordSuccess(message: $message, token: $token)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $ForgotPasswordSuccessCopyWith<$Res> implements $AuthStateCopyWith<$Res> {
+  factory $ForgotPasswordSuccessCopyWith(ForgotPasswordSuccess value, $Res Function(ForgotPasswordSuccess) _then) = _$ForgotPasswordSuccessCopyWithImpl;
+@useResult
+$Res call({
+ String message, String? token
+});
+
+
+
+
+}
+/// @nodoc
+class _$ForgotPasswordSuccessCopyWithImpl<$Res>
+    implements $ForgotPasswordSuccessCopyWith<$Res> {
+  _$ForgotPasswordSuccessCopyWithImpl(this._self, this._then);
+
+  final ForgotPasswordSuccess _self;
+  final $Res Function(ForgotPasswordSuccess) _then;
+
+/// Create a copy of AuthState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? message = null,Object? token = freezed,}) {
+  return _then(ForgotPasswordSuccess(
+null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
+as String,freezed == token ? _self.token : token // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

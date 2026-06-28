@@ -1,5 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../config/di/di.dart';
+import '../../../../core/storage/secure_storage_service.dart';
+import '../../../../core/utils/functions/remeber_me.dart';
 import '../../../lookups/domain/entities/lookup_item_entity.dart';
 import '../../../lookups/presentation/cubit/lookup_cubit.dart';
 import '../../../lookups/presentation/cubit/lookup_state.dart';
@@ -425,12 +428,14 @@ class _RegisterCustomerMobileBodyState
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
         state.whenOrNull(
-          success: (user) {
+          success: (user) async {
             AppSnackBar.show(
               context,
               message: l10n.registerSuccessMessage,
               type: AppSnackType.success,
             );
+
+            if (!context.mounted) return;
 
             Navigator.pushReplacementNamed(
               context,
@@ -506,13 +511,16 @@ class _RegisterCustomerTabletBodyState
 
           state.whenOrNull(
 
-            success: (user) {
+            success: (user) async {
 
               AppSnackBar.show(
                 context,
                 message: l10n.registerSuccessMessage,
                 type: AppSnackType.success,
               );
+
+
+              if (!context.mounted) return;
 
               Navigator.pushReplacementNamed(
                 context,
@@ -521,7 +529,6 @@ class _RegisterCustomerTabletBodyState
             },
 
             error: (message) {
-
               AppSnackBar.show(
                 context,
                 message: message,

@@ -45,21 +45,21 @@ class AppProfilePopup extends StatelessWidget {
   // ── Default customer actions ──────────────────────────────
   static List<AppProfileMenuAction> customerActions(
     BuildContext context, {
-    required String profile,
+    // required String profile,
     required String edit,
     required String settings,
     required String help,
     required String logout,
     required VoidCallback onLogout,
   }) => [
-    AppProfileMenuAction(
-      icon: Icons.person_outline_rounded,
-      label: profile,
-      onTap: () {
-        Navigator.pop(context);
-        // Profile tab is already in shell — just pop
-      },
-    ),
+    // AppProfileMenuAction(
+    //   icon: Icons.person_outline_rounded,
+    //   label: profile,
+    //   onTap: () {
+    //     Navigator.pop(context);
+    //     // Profile tab is already in shell — just pop
+    //   },
+    // ),
     AppProfileMenuAction(
       icon: Icons.edit_outlined,
       label: edit,

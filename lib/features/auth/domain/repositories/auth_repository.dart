@@ -8,6 +8,7 @@ import '../../data/models/requests/register_handyman_request.dart';
 import '../../data/models/requests/forgot_password_request.dart';
 import '../../data/models/requests/reset_password_request.dart';
 import '../../data/models/requests/verify_otp_request.dart';
+import '../../data/models/responses/message_response_model.dart';
 import '../entities/auth_user_entity.dart';
 
 abstract class AuthRepository {
@@ -25,7 +26,7 @@ abstract class AuthRepository {
       RegisterHandymanRequest request,
       );
 
-  Future<Either<Failure, String>>
+  Future<Either<Failure, MessageResponseModel>>
   forgotPassword(
       ForgotPasswordRequest request,
       );

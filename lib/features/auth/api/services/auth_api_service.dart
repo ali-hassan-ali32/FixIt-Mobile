@@ -40,6 +40,6 @@ abstract class AuthApiService {
     @Body() ResetPasswordRequest request,
   );
 
-  @POST('/auth/verify-otp')
+  @POST(ApiConstants.verifyOtp)
   Future<MessageResponseModel> verifyOtp(@Body() VerifyOtpRequest request);
 }

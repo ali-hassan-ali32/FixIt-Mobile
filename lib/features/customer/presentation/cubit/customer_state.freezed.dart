@@ -55,7 +55,7 @@ extension CustomerStatePatterns on CustomerState {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( CustomerInitial value)?  initial,TResult Function( CustomerLoading value)?  loading,TResult Function( CustomerProfileLoaded value)?  profileLoaded,TResult Function( CustomerRequestsLoaded value)?  requestsLoaded,TResult Function( CustomerRequestDetailsLoaded value)?  requestDetailsLoaded,TResult Function( CustomerStatisticsLoaded value)?  statisticsLoaded,TResult Function( CustomerMessage value)?  message,TResult Function( CustomerError value)?  error,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( CustomerInitial value)?  initial,TResult Function( CustomerLoading value)?  loading,TResult Function( CustomerProfileLoaded value)?  profileLoaded,TResult Function( CustomerRequestsLoaded value)?  requestsLoaded,TResult Function( CustomerRequestDetailsLoaded value)?  requestDetailsLoaded,TResult Function( CustomerStatisticsLoaded value)?  statisticsLoaded,TResult Function( CustomerMessage value)?  message,TResult Function( CustomerError value)?  error,TResult Function( CustomerHandymenLoaded value)?  handymenLoaded,TResult Function( CustomerFeaturedHandymenLoaded value)?  featuredHandymenLoaded,TResult Function( CustomerHandymanDetailsLoaded value)?  handymanDetailsLoaded,TResult Function( CustomerPortfolioLoaded value)?  portfolioLoaded,TResult Function( CustomerHandymanReviewsLoaded value)?  handymanReviewsLoaded,TResult Function( CustomerMyReviewsLoaded value)?  myReviewsLoaded,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case CustomerInitial() when initial != null:
@@ -66,7 +66,13 @@ return requestsLoaded(_that);case CustomerRequestDetailsLoaded() when requestDet
 return requestDetailsLoaded(_that);case CustomerStatisticsLoaded() when statisticsLoaded != null:
 return statisticsLoaded(_that);case CustomerMessage() when message != null:
 return message(_that);case CustomerError() when error != null:
-return error(_that);case _:
+return error(_that);case CustomerHandymenLoaded() when handymenLoaded != null:
+return handymenLoaded(_that);case CustomerFeaturedHandymenLoaded() when featuredHandymenLoaded != null:
+return featuredHandymenLoaded(_that);case CustomerHandymanDetailsLoaded() when handymanDetailsLoaded != null:
+return handymanDetailsLoaded(_that);case CustomerPortfolioLoaded() when portfolioLoaded != null:
+return portfolioLoaded(_that);case CustomerHandymanReviewsLoaded() when handymanReviewsLoaded != null:
+return handymanReviewsLoaded(_that);case CustomerMyReviewsLoaded() when myReviewsLoaded != null:
+return myReviewsLoaded(_that);case _:
   return orElse();
 
 }
@@ -84,7 +90,7 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( CustomerInitial value)  initial,required TResult Function( CustomerLoading value)  loading,required TResult Function( CustomerProfileLoaded value)  profileLoaded,required TResult Function( CustomerRequestsLoaded value)  requestsLoaded,required TResult Function( CustomerRequestDetailsLoaded value)  requestDetailsLoaded,required TResult Function( CustomerStatisticsLoaded value)  statisticsLoaded,required TResult Function( CustomerMessage value)  message,required TResult Function( CustomerError value)  error,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( CustomerInitial value)  initial,required TResult Function( CustomerLoading value)  loading,required TResult Function( CustomerProfileLoaded value)  profileLoaded,required TResult Function( CustomerRequestsLoaded value)  requestsLoaded,required TResult Function( CustomerRequestDetailsLoaded value)  requestDetailsLoaded,required TResult Function( CustomerStatisticsLoaded value)  statisticsLoaded,required TResult Function( CustomerMessage value)  message,required TResult Function( CustomerError value)  error,required TResult Function( CustomerHandymenLoaded value)  handymenLoaded,required TResult Function( CustomerFeaturedHandymenLoaded value)  featuredHandymenLoaded,required TResult Function( CustomerHandymanDetailsLoaded value)  handymanDetailsLoaded,required TResult Function( CustomerPortfolioLoaded value)  portfolioLoaded,required TResult Function( CustomerHandymanReviewsLoaded value)  handymanReviewsLoaded,required TResult Function( CustomerMyReviewsLoaded value)  myReviewsLoaded,}){
 final _that = this;
 switch (_that) {
 case CustomerInitial():
@@ -95,7 +101,13 @@ return requestsLoaded(_that);case CustomerRequestDetailsLoaded():
 return requestDetailsLoaded(_that);case CustomerStatisticsLoaded():
 return statisticsLoaded(_that);case CustomerMessage():
 return message(_that);case CustomerError():
-return error(_that);case _:
+return error(_that);case CustomerHandymenLoaded():
+return handymenLoaded(_that);case CustomerFeaturedHandymenLoaded():
+return featuredHandymenLoaded(_that);case CustomerHandymanDetailsLoaded():
+return handymanDetailsLoaded(_that);case CustomerPortfolioLoaded():
+return portfolioLoaded(_that);case CustomerHandymanReviewsLoaded():
+return handymanReviewsLoaded(_that);case CustomerMyReviewsLoaded():
+return myReviewsLoaded(_that);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -112,7 +124,7 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( CustomerInitial value)?  initial,TResult? Function( CustomerLoading value)?  loading,TResult? Function( CustomerProfileLoaded value)?  profileLoaded,TResult? Function( CustomerRequestsLoaded value)?  requestsLoaded,TResult? Function( CustomerRequestDetailsLoaded value)?  requestDetailsLoaded,TResult? Function( CustomerStatisticsLoaded value)?  statisticsLoaded,TResult? Function( CustomerMessage value)?  message,TResult? Function( CustomerError value)?  error,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( CustomerInitial value)?  initial,TResult? Function( CustomerLoading value)?  loading,TResult? Function( CustomerProfileLoaded value)?  profileLoaded,TResult? Function( CustomerRequestsLoaded value)?  requestsLoaded,TResult? Function( CustomerRequestDetailsLoaded value)?  requestDetailsLoaded,TResult? Function( CustomerStatisticsLoaded value)?  statisticsLoaded,TResult? Function( CustomerMessage value)?  message,TResult? Function( CustomerError value)?  error,TResult? Function( CustomerHandymenLoaded value)?  handymenLoaded,TResult? Function( CustomerFeaturedHandymenLoaded value)?  featuredHandymenLoaded,TResult? Function( CustomerHandymanDetailsLoaded value)?  handymanDetailsLoaded,TResult? Function( CustomerPortfolioLoaded value)?  portfolioLoaded,TResult? Function( CustomerHandymanReviewsLoaded value)?  handymanReviewsLoaded,TResult? Function( CustomerMyReviewsLoaded value)?  myReviewsLoaded,}){
 final _that = this;
 switch (_that) {
 case CustomerInitial() when initial != null:
@@ -123,7 +135,13 @@ return requestsLoaded(_that);case CustomerRequestDetailsLoaded() when requestDet
 return requestDetailsLoaded(_that);case CustomerStatisticsLoaded() when statisticsLoaded != null:
 return statisticsLoaded(_that);case CustomerMessage() when message != null:
 return message(_that);case CustomerError() when error != null:
-return error(_that);case _:
+return error(_that);case CustomerHandymenLoaded() when handymenLoaded != null:
+return handymenLoaded(_that);case CustomerFeaturedHandymenLoaded() when featuredHandymenLoaded != null:
+return featuredHandymenLoaded(_that);case CustomerHandymanDetailsLoaded() when handymanDetailsLoaded != null:
+return handymanDetailsLoaded(_that);case CustomerPortfolioLoaded() when portfolioLoaded != null:
+return portfolioLoaded(_that);case CustomerHandymanReviewsLoaded() when handymanReviewsLoaded != null:
+return handymanReviewsLoaded(_that);case CustomerMyReviewsLoaded() when myReviewsLoaded != null:
+return myReviewsLoaded(_that);case _:
   return null;
 
 }
@@ -140,7 +158,7 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( CustomerProfileEntity profile)?  profileLoaded,TResult Function( List<CustomerRequestSummaryEntity> requests)?  requestsLoaded,TResult Function( CustomerRequestDetailsEntity request)?  requestDetailsLoaded,TResult Function( CustomerStatisticsEntity statistics)?  statisticsLoaded,TResult Function( String message)?  message,TResult Function( String message)?  error,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( CustomerProfileEntity profile)?  profileLoaded,TResult Function( List<CustomerRequestSummaryEntity> requests)?  requestsLoaded,TResult Function( CustomerRequestDetailsEntity request)?  requestDetailsLoaded,TResult Function( CustomerStatisticsEntity statistics)?  statisticsLoaded,TResult Function( String message)?  message,TResult Function( String message)?  error,TResult Function( List<HandymanListEntity> handymen)?  handymenLoaded,TResult Function( List<HandymanListEntity> handymen)?  featuredHandymenLoaded,TResult Function( HandymanDetailsEntity handyman)?  handymanDetailsLoaded,TResult Function( List<PortfolioItemEntity> portfolio)?  portfolioLoaded,TResult Function( List<ReviewEntity> reviews)?  handymanReviewsLoaded,TResult Function( List<ReviewEntity> reviews)?  myReviewsLoaded,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case CustomerInitial() when initial != null:
 return initial();case CustomerLoading() when loading != null:
@@ -150,7 +168,13 @@ return requestsLoaded(_that.requests);case CustomerRequestDetailsLoaded() when r
 return requestDetailsLoaded(_that.request);case CustomerStatisticsLoaded() when statisticsLoaded != null:
 return statisticsLoaded(_that.statistics);case CustomerMessage() when message != null:
 return message(_that.message);case CustomerError() when error != null:
-return error(_that.message);case _:
+return error(_that.message);case CustomerHandymenLoaded() when handymenLoaded != null:
+return handymenLoaded(_that.handymen);case CustomerFeaturedHandymenLoaded() when featuredHandymenLoaded != null:
+return featuredHandymenLoaded(_that.handymen);case CustomerHandymanDetailsLoaded() when handymanDetailsLoaded != null:
+return handymanDetailsLoaded(_that.handyman);case CustomerPortfolioLoaded() when portfolioLoaded != null:
+return portfolioLoaded(_that.portfolio);case CustomerHandymanReviewsLoaded() when handymanReviewsLoaded != null:
+return handymanReviewsLoaded(_that.reviews);case CustomerMyReviewsLoaded() when myReviewsLoaded != null:
+return myReviewsLoaded(_that.reviews);case _:
   return orElse();
 
 }
@@ -168,7 +192,7 @@ return error(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( CustomerProfileEntity profile)  profileLoaded,required TResult Function( List<CustomerRequestSummaryEntity> requests)  requestsLoaded,required TResult Function( CustomerRequestDetailsEntity request)  requestDetailsLoaded,required TResult Function( CustomerStatisticsEntity statistics)  statisticsLoaded,required TResult Function( String message)  message,required TResult Function( String message)  error,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( CustomerProfileEntity profile)  profileLoaded,required TResult Function( List<CustomerRequestSummaryEntity> requests)  requestsLoaded,required TResult Function( CustomerRequestDetailsEntity request)  requestDetailsLoaded,required TResult Function( CustomerStatisticsEntity statistics)  statisticsLoaded,required TResult Function( String message)  message,required TResult Function( String message)  error,required TResult Function( List<HandymanListEntity> handymen)  handymenLoaded,required TResult Function( List<HandymanListEntity> handymen)  featuredHandymenLoaded,required TResult Function( HandymanDetailsEntity handyman)  handymanDetailsLoaded,required TResult Function( List<PortfolioItemEntity> portfolio)  portfolioLoaded,required TResult Function( List<ReviewEntity> reviews)  handymanReviewsLoaded,required TResult Function( List<ReviewEntity> reviews)  myReviewsLoaded,}) {final _that = this;
 switch (_that) {
 case CustomerInitial():
 return initial();case CustomerLoading():
@@ -178,7 +202,13 @@ return requestsLoaded(_that.requests);case CustomerRequestDetailsLoaded():
 return requestDetailsLoaded(_that.request);case CustomerStatisticsLoaded():
 return statisticsLoaded(_that.statistics);case CustomerMessage():
 return message(_that.message);case CustomerError():
-return error(_that.message);case _:
+return error(_that.message);case CustomerHandymenLoaded():
+return handymenLoaded(_that.handymen);case CustomerFeaturedHandymenLoaded():
+return featuredHandymenLoaded(_that.handymen);case CustomerHandymanDetailsLoaded():
+return handymanDetailsLoaded(_that.handyman);case CustomerPortfolioLoaded():
+return portfolioLoaded(_that.portfolio);case CustomerHandymanReviewsLoaded():
+return handymanReviewsLoaded(_that.reviews);case CustomerMyReviewsLoaded():
+return myReviewsLoaded(_that.reviews);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -195,7 +225,7 @@ return error(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( CustomerProfileEntity profile)?  profileLoaded,TResult? Function( List<CustomerRequestSummaryEntity> requests)?  requestsLoaded,TResult? Function( CustomerRequestDetailsEntity request)?  requestDetailsLoaded,TResult? Function( CustomerStatisticsEntity statistics)?  statisticsLoaded,TResult? Function( String message)?  message,TResult? Function( String message)?  error,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( CustomerProfileEntity profile)?  profileLoaded,TResult? Function( List<CustomerRequestSummaryEntity> requests)?  requestsLoaded,TResult? Function( CustomerRequestDetailsEntity request)?  requestDetailsLoaded,TResult? Function( CustomerStatisticsEntity statistics)?  statisticsLoaded,TResult? Function( String message)?  message,TResult? Function( String message)?  error,TResult? Function( List<HandymanListEntity> handymen)?  handymenLoaded,TResult? Function( List<HandymanListEntity> handymen)?  featuredHandymenLoaded,TResult? Function( HandymanDetailsEntity handyman)?  handymanDetailsLoaded,TResult? Function( List<PortfolioItemEntity> portfolio)?  portfolioLoaded,TResult? Function( List<ReviewEntity> reviews)?  handymanReviewsLoaded,TResult? Function( List<ReviewEntity> reviews)?  myReviewsLoaded,}) {final _that = this;
 switch (_that) {
 case CustomerInitial() when initial != null:
 return initial();case CustomerLoading() when loading != null:
@@ -205,7 +235,13 @@ return requestsLoaded(_that.requests);case CustomerRequestDetailsLoaded() when r
 return requestDetailsLoaded(_that.request);case CustomerStatisticsLoaded() when statisticsLoaded != null:
 return statisticsLoaded(_that.statistics);case CustomerMessage() when message != null:
 return message(_that.message);case CustomerError() when error != null:
-return error(_that.message);case _:
+return error(_that.message);case CustomerHandymenLoaded() when handymenLoaded != null:
+return handymenLoaded(_that.handymen);case CustomerFeaturedHandymenLoaded() when featuredHandymenLoaded != null:
+return featuredHandymenLoaded(_that.handymen);case CustomerHandymanDetailsLoaded() when handymanDetailsLoaded != null:
+return handymanDetailsLoaded(_that.handyman);case CustomerPortfolioLoaded() when portfolioLoaded != null:
+return portfolioLoaded(_that.portfolio);case CustomerHandymanReviewsLoaded() when handymanReviewsLoaded != null:
+return handymanReviewsLoaded(_that.reviews);case CustomerMyReviewsLoaded() when myReviewsLoaded != null:
+return myReviewsLoaded(_that.reviews);case _:
   return null;
 
 }
@@ -673,6 +709,432 @@ class _$CustomerErrorCopyWithImpl<$Res>
   return _then(CustomerError(
 null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
 as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class CustomerHandymenLoaded implements CustomerState {
+  const CustomerHandymenLoaded(final  List<HandymanListEntity> handymen): _handymen = handymen;
+  
+
+ final  List<HandymanListEntity> _handymen;
+ List<HandymanListEntity> get handymen {
+  if (_handymen is EqualUnmodifiableListView) return _handymen;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_handymen);
+}
+
+
+/// Create a copy of CustomerState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$CustomerHandymenLoadedCopyWith<CustomerHandymenLoaded> get copyWith => _$CustomerHandymenLoadedCopyWithImpl<CustomerHandymenLoaded>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CustomerHandymenLoaded&&const DeepCollectionEquality().equals(other._handymen, _handymen));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_handymen));
+
+@override
+String toString() {
+  return 'CustomerState.handymenLoaded(handymen: $handymen)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $CustomerHandymenLoadedCopyWith<$Res> implements $CustomerStateCopyWith<$Res> {
+  factory $CustomerHandymenLoadedCopyWith(CustomerHandymenLoaded value, $Res Function(CustomerHandymenLoaded) _then) = _$CustomerHandymenLoadedCopyWithImpl;
+@useResult
+$Res call({
+ List<HandymanListEntity> handymen
+});
+
+
+
+
+}
+/// @nodoc
+class _$CustomerHandymenLoadedCopyWithImpl<$Res>
+    implements $CustomerHandymenLoadedCopyWith<$Res> {
+  _$CustomerHandymenLoadedCopyWithImpl(this._self, this._then);
+
+  final CustomerHandymenLoaded _self;
+  final $Res Function(CustomerHandymenLoaded) _then;
+
+/// Create a copy of CustomerState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? handymen = null,}) {
+  return _then(CustomerHandymenLoaded(
+null == handymen ? _self._handymen : handymen // ignore: cast_nullable_to_non_nullable
+as List<HandymanListEntity>,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class CustomerFeaturedHandymenLoaded implements CustomerState {
+  const CustomerFeaturedHandymenLoaded(final  List<HandymanListEntity> handymen): _handymen = handymen;
+  
+
+ final  List<HandymanListEntity> _handymen;
+ List<HandymanListEntity> get handymen {
+  if (_handymen is EqualUnmodifiableListView) return _handymen;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_handymen);
+}
+
+
+/// Create a copy of CustomerState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$CustomerFeaturedHandymenLoadedCopyWith<CustomerFeaturedHandymenLoaded> get copyWith => _$CustomerFeaturedHandymenLoadedCopyWithImpl<CustomerFeaturedHandymenLoaded>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CustomerFeaturedHandymenLoaded&&const DeepCollectionEquality().equals(other._handymen, _handymen));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_handymen));
+
+@override
+String toString() {
+  return 'CustomerState.featuredHandymenLoaded(handymen: $handymen)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $CustomerFeaturedHandymenLoadedCopyWith<$Res> implements $CustomerStateCopyWith<$Res> {
+  factory $CustomerFeaturedHandymenLoadedCopyWith(CustomerFeaturedHandymenLoaded value, $Res Function(CustomerFeaturedHandymenLoaded) _then) = _$CustomerFeaturedHandymenLoadedCopyWithImpl;
+@useResult
+$Res call({
+ List<HandymanListEntity> handymen
+});
+
+
+
+
+}
+/// @nodoc
+class _$CustomerFeaturedHandymenLoadedCopyWithImpl<$Res>
+    implements $CustomerFeaturedHandymenLoadedCopyWith<$Res> {
+  _$CustomerFeaturedHandymenLoadedCopyWithImpl(this._self, this._then);
+
+  final CustomerFeaturedHandymenLoaded _self;
+  final $Res Function(CustomerFeaturedHandymenLoaded) _then;
+
+/// Create a copy of CustomerState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? handymen = null,}) {
+  return _then(CustomerFeaturedHandymenLoaded(
+null == handymen ? _self._handymen : handymen // ignore: cast_nullable_to_non_nullable
+as List<HandymanListEntity>,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class CustomerHandymanDetailsLoaded implements CustomerState {
+  const CustomerHandymanDetailsLoaded(this.handyman);
+  
+
+ final  HandymanDetailsEntity handyman;
+
+/// Create a copy of CustomerState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$CustomerHandymanDetailsLoadedCopyWith<CustomerHandymanDetailsLoaded> get copyWith => _$CustomerHandymanDetailsLoadedCopyWithImpl<CustomerHandymanDetailsLoaded>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CustomerHandymanDetailsLoaded&&(identical(other.handyman, handyman) || other.handyman == handyman));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,handyman);
+
+@override
+String toString() {
+  return 'CustomerState.handymanDetailsLoaded(handyman: $handyman)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $CustomerHandymanDetailsLoadedCopyWith<$Res> implements $CustomerStateCopyWith<$Res> {
+  factory $CustomerHandymanDetailsLoadedCopyWith(CustomerHandymanDetailsLoaded value, $Res Function(CustomerHandymanDetailsLoaded) _then) = _$CustomerHandymanDetailsLoadedCopyWithImpl;
+@useResult
+$Res call({
+ HandymanDetailsEntity handyman
+});
+
+
+
+
+}
+/// @nodoc
+class _$CustomerHandymanDetailsLoadedCopyWithImpl<$Res>
+    implements $CustomerHandymanDetailsLoadedCopyWith<$Res> {
+  _$CustomerHandymanDetailsLoadedCopyWithImpl(this._self, this._then);
+
+  final CustomerHandymanDetailsLoaded _self;
+  final $Res Function(CustomerHandymanDetailsLoaded) _then;
+
+/// Create a copy of CustomerState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? handyman = null,}) {
+  return _then(CustomerHandymanDetailsLoaded(
+null == handyman ? _self.handyman : handyman // ignore: cast_nullable_to_non_nullable
+as HandymanDetailsEntity,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class CustomerPortfolioLoaded implements CustomerState {
+  const CustomerPortfolioLoaded(final  List<PortfolioItemEntity> portfolio): _portfolio = portfolio;
+  
+
+ final  List<PortfolioItemEntity> _portfolio;
+ List<PortfolioItemEntity> get portfolio {
+  if (_portfolio is EqualUnmodifiableListView) return _portfolio;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_portfolio);
+}
+
+
+/// Create a copy of CustomerState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$CustomerPortfolioLoadedCopyWith<CustomerPortfolioLoaded> get copyWith => _$CustomerPortfolioLoadedCopyWithImpl<CustomerPortfolioLoaded>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CustomerPortfolioLoaded&&const DeepCollectionEquality().equals(other._portfolio, _portfolio));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_portfolio));
+
+@override
+String toString() {
+  return 'CustomerState.portfolioLoaded(portfolio: $portfolio)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $CustomerPortfolioLoadedCopyWith<$Res> implements $CustomerStateCopyWith<$Res> {
+  factory $CustomerPortfolioLoadedCopyWith(CustomerPortfolioLoaded value, $Res Function(CustomerPortfolioLoaded) _then) = _$CustomerPortfolioLoadedCopyWithImpl;
+@useResult
+$Res call({
+ List<PortfolioItemEntity> portfolio
+});
+
+
+
+
+}
+/// @nodoc
+class _$CustomerPortfolioLoadedCopyWithImpl<$Res>
+    implements $CustomerPortfolioLoadedCopyWith<$Res> {
+  _$CustomerPortfolioLoadedCopyWithImpl(this._self, this._then);
+
+  final CustomerPortfolioLoaded _self;
+  final $Res Function(CustomerPortfolioLoaded) _then;
+
+/// Create a copy of CustomerState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? portfolio = null,}) {
+  return _then(CustomerPortfolioLoaded(
+null == portfolio ? _self._portfolio : portfolio // ignore: cast_nullable_to_non_nullable
+as List<PortfolioItemEntity>,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class CustomerHandymanReviewsLoaded implements CustomerState {
+  const CustomerHandymanReviewsLoaded(final  List<ReviewEntity> reviews): _reviews = reviews;
+  
+
+ final  List<ReviewEntity> _reviews;
+ List<ReviewEntity> get reviews {
+  if (_reviews is EqualUnmodifiableListView) return _reviews;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_reviews);
+}
+
+
+/// Create a copy of CustomerState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$CustomerHandymanReviewsLoadedCopyWith<CustomerHandymanReviewsLoaded> get copyWith => _$CustomerHandymanReviewsLoadedCopyWithImpl<CustomerHandymanReviewsLoaded>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CustomerHandymanReviewsLoaded&&const DeepCollectionEquality().equals(other._reviews, _reviews));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_reviews));
+
+@override
+String toString() {
+  return 'CustomerState.handymanReviewsLoaded(reviews: $reviews)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $CustomerHandymanReviewsLoadedCopyWith<$Res> implements $CustomerStateCopyWith<$Res> {
+  factory $CustomerHandymanReviewsLoadedCopyWith(CustomerHandymanReviewsLoaded value, $Res Function(CustomerHandymanReviewsLoaded) _then) = _$CustomerHandymanReviewsLoadedCopyWithImpl;
+@useResult
+$Res call({
+ List<ReviewEntity> reviews
+});
+
+
+
+
+}
+/// @nodoc
+class _$CustomerHandymanReviewsLoadedCopyWithImpl<$Res>
+    implements $CustomerHandymanReviewsLoadedCopyWith<$Res> {
+  _$CustomerHandymanReviewsLoadedCopyWithImpl(this._self, this._then);
+
+  final CustomerHandymanReviewsLoaded _self;
+  final $Res Function(CustomerHandymanReviewsLoaded) _then;
+
+/// Create a copy of CustomerState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? reviews = null,}) {
+  return _then(CustomerHandymanReviewsLoaded(
+null == reviews ? _self._reviews : reviews // ignore: cast_nullable_to_non_nullable
+as List<ReviewEntity>,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class CustomerMyReviewsLoaded implements CustomerState {
+  const CustomerMyReviewsLoaded(final  List<ReviewEntity> reviews): _reviews = reviews;
+  
+
+ final  List<ReviewEntity> _reviews;
+ List<ReviewEntity> get reviews {
+  if (_reviews is EqualUnmodifiableListView) return _reviews;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_reviews);
+}
+
+
+/// Create a copy of CustomerState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$CustomerMyReviewsLoadedCopyWith<CustomerMyReviewsLoaded> get copyWith => _$CustomerMyReviewsLoadedCopyWithImpl<CustomerMyReviewsLoaded>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CustomerMyReviewsLoaded&&const DeepCollectionEquality().equals(other._reviews, _reviews));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_reviews));
+
+@override
+String toString() {
+  return 'CustomerState.myReviewsLoaded(reviews: $reviews)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $CustomerMyReviewsLoadedCopyWith<$Res> implements $CustomerStateCopyWith<$Res> {
+  factory $CustomerMyReviewsLoadedCopyWith(CustomerMyReviewsLoaded value, $Res Function(CustomerMyReviewsLoaded) _then) = _$CustomerMyReviewsLoadedCopyWithImpl;
+@useResult
+$Res call({
+ List<ReviewEntity> reviews
+});
+
+
+
+
+}
+/// @nodoc
+class _$CustomerMyReviewsLoadedCopyWithImpl<$Res>
+    implements $CustomerMyReviewsLoadedCopyWith<$Res> {
+  _$CustomerMyReviewsLoadedCopyWithImpl(this._self, this._then);
+
+  final CustomerMyReviewsLoaded _self;
+  final $Res Function(CustomerMyReviewsLoaded) _then;
+
+/// Create a copy of CustomerState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? reviews = null,}) {
+  return _then(CustomerMyReviewsLoaded(
+null == reviews ? _self._reviews : reviews // ignore: cast_nullable_to_non_nullable
+as List<ReviewEntity>,
   ));
 }
 

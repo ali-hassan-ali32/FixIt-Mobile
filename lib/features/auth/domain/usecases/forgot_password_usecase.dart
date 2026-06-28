@@ -3,6 +3,7 @@ import 'package:injectable/injectable.dart';
 
 import '../../../../core/network/failure.dart';
 
+import '../../data/models/responses/message_response_model.dart';
 import '../repositories/auth_repository.dart';
 
 import '../../data/models/requests/forgot_password_request.dart';
@@ -15,9 +16,7 @@ class ForgotPasswordUseCase {
       this.repository,
       );
 
-  Future<Either<Failure, String>> call(
-      ForgotPasswordRequest request,
-      ) {
+  Future<Either<Failure, MessageResponseModel>> call(ForgotPasswordRequest request,) {
     return repository.forgotPassword(
       request,
     );

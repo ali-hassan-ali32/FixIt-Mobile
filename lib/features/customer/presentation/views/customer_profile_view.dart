@@ -3,13 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import '../../../../core/l10n/translation/app_localizations.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_sizes.dart';
+import '../../../../core/utils/functions/logout.dart';
 import '../../../../core/utils/functions/remeber_me.dart';
-import '../../../../core/utils/widgets/animations/shimmers/app_state_box_shimmer.dart';
 import '../../../../core/utils/widgets/app_main_background.dart';
 import '../../../../core/utils/widgets/animations/animated_confirm_dialog.dart';
 import '../../../../core/utils/widgets/app_snack_bar.dart';
@@ -38,9 +37,7 @@ class CustomerProfileView extends StatelessWidget {
 // ══════════════════════════════════════════════════════════════
 // Shared base — animations + logic
 // ══════════════════════════════════════════════════════════════
-abstract class _ProfileBase<T extends StatefulWidget> extends State<T>
-    with TickerProviderStateMixin {
-  static const Color _accent = Color(0xFFFF6B35); // AppColors.primary[60]
+abstract class _ProfileBase<T extends StatefulWidget> extends State<T> with TickerProviderStateMixin {
 
   late final AnimationController entryCtrl;
 
@@ -143,9 +140,13 @@ abstract class _ProfileBase<T extends StatefulWidget> extends State<T>
       confirmLabel: l10n.profileMenuLogout,
       isDanger: true,
       onConfirm: () async {
-        await clearRememberMe();
+        await logout();
         if (!mounted) return;
-        Navigator.of(context).pushReplacementNamed(AppRoutes.login);
+
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          AppRoutes.login,
+              (route) => false,
+        );
       },
     );
   }
@@ -315,19 +316,16 @@ class CustomerProfileMobileBody extends StatefulWidget {
   const CustomerProfileMobileBody({super.key});
 
   @override
-  State<CustomerProfileMobileBody> createState() =>
-      _CustomerProfileMobileBodyState();
+  State<CustomerProfileMobileBody> createState() => _CustomerProfileMobileBodyState();
 }
 
-class _CustomerProfileMobileBodyState
-    extends _ProfileBase<CustomerProfileMobileBody> {
+class _CustomerProfileMobileBodyState extends _ProfileBase<CustomerProfileMobileBody> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
     final l10n = AppLocalizations.of(context)!;
-    final cubit = context.watch<CustomerCubit>();
 
     return BlocListener<CustomerCubit, CustomerState>(
         listener: (context, state) {
@@ -434,7 +432,7 @@ class _CustomerProfileMobileBodyState
           buildAvatar(),
           SizedBox(height: 16.h),
           sa(0, Text(
-             cubit.profileData?.fullName ?? 'غير معروف',
+             cubit.customerProfileData?.fullName ?? 'غير معروف',
              style: textTheme.headlineSmall?.copyWith(
                fontWeight: FontWeight.w800,),
           )),
@@ -623,7 +621,7 @@ class _CustomerProfileTabletBodyState
           SizedBox(height: 16.h),
 
           Text(
-            cubit.profileData?.fullName ?? 'غير معروف',
+            cubit.customerProfileData?.fullName ?? 'غير معروف',
             style: textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.w800,
             ),

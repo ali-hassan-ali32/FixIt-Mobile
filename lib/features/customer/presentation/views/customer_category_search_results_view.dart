@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -11,91 +12,94 @@ import '../../../../core/utils/widgets/app_main_background.dart';
 import '../../../../core/utils/widgets/app_empty_states.dart';
 import '../../../../core/utils/widgets/app_page_header.dart';
 import '../../../../core/utils/widgets/app_rating_star.dart';
+import '../../domain/entities/handyman_list_entity.dart';
+import '../cubit/customer_cubit.dart';
+import '../cubit/customer_state.dart';
 
-// ══════════════════════════════════════════════════════════════
-// Model
-// ══════════════════════════════════════════════════════════════
-class _Item {
-  final String id;
-  final String name;
-  final String specialty;
-  final double rating;
-  final int reviewCount;
-  final int yearsExp;
-  final int hourlyRate;
-  final bool isAvailable;
-  final List<Color> avatarColors;
-
-  const _Item({
-    required this.id,
-    required this.name,
-    required this.specialty,
-    required this.rating,
-    required this.reviewCount,
-    required this.yearsExp,
-    required this.hourlyRate,
-    required this.isAvailable,
-    required this.avatarColors,
-  });
-}
-
-final _kItems = [
-  _Item(
-    id: '1',
-    name: 'محمد علي',
-    specialty: 'فني سباكة محترف',
-    rating: 4.9,
-    reviewCount: 128,
-    yearsExp: 8,
-    hourlyRate: 150,
-    isAvailable: true,
-    avatarColors: [AppColors.primary[60]!, AppColors.secondary[60]!],
-  ),
-  _Item(
-    id: '2',
-    name: 'أحمد حسن',
-    specialty: 'فني سباكة خبير',
-    rating: 5.0,
-    reviewCount: 210,
-    yearsExp: 10,
-    hourlyRate: 180,
-    isAvailable: true,
-    avatarColors: [const Color(0xFF667eea), const Color(0xFF764ba2)],
-  ),
-  _Item(
-    id: '3',
-    name: 'خالد إبراهيم',
-    specialty: 'متخصص سباكة',
-    rating: 4.8,
-    reviewCount: 95,
-    yearsExp: 6,
-    hourlyRate: 120,
-    isAvailable: true,
-    avatarColors: [const Color(0xFF11998e), const Color(0xFF38ef7d)],
-  ),
-  _Item(
-    id: '4',
-    name: 'عمر سعيد',
-    specialty: 'فني سباكة',
-    rating: 4.7,
-    reviewCount: 80,
-    yearsExp: 5,
-    hourlyRate: 110,
-    isAvailable: false,
-    avatarColors: [const Color(0xFFe74c3c), const Color(0xFFc0392b)],
-  ),
-  _Item(
-    id: '5',
-    name: 'يوسف محمود',
-    specialty: 'فني سباكة',
-    rating: 4.6,
-    reviewCount: 62,
-    yearsExp: 4,
-    hourlyRate: 100,
-    isAvailable: true,
-    avatarColors: [const Color(0xFF9b59b6), const Color(0xFF8e44ad)],
-  ),
-];
+// // ══════════════════════════════════════════════════════════════
+// // Model
+// // ══════════════════════════════════════════════════════════════
+// class _Item {
+//   final String id;
+//   final String name;
+//   final String specialty;
+//   final double rating;
+//   final int reviewCount;
+//   final int yearsExp;
+//   final int hourlyRate;
+//   final bool isAvailable;
+//   final List<Color> avatarColors;
+//
+//   const _Item({
+//     required this.id,
+//     required this.name,
+//     required this.specialty,
+//     required this.rating,
+//     required this.reviewCount,
+//     required this.yearsExp,
+//     required this.hourlyRate,
+//     required this.isAvailable,
+//     required this.avatarColors,
+//   });
+// }
+//
+// final _kItems = [
+//   _Item(
+//     id: '1',
+//     name: 'محمد علي',
+//     specialty: 'فني سباكة محترف',
+//     rating: 4.9,
+//     reviewCount: 128,
+//     yearsExp: 8,
+//     hourlyRate: 150,
+//     isAvailable: true,
+//     avatarColors: [AppColors.primary[60]!, AppColors.secondary[60]!],
+//   ),
+//   _Item(
+//     id: '2',
+//     name: 'أحمد حسن',
+//     specialty: 'فني سباكة خبير',
+//     rating: 5.0,
+//     reviewCount: 210,
+//     yearsExp: 10,
+//     hourlyRate: 180,
+//     isAvailable: true,
+//     avatarColors: [const Color(0xFF667eea), const Color(0xFF764ba2)],
+//   ),
+//   _Item(
+//     id: '3',
+//     name: 'خالد إبراهيم',
+//     specialty: 'متخصص سباكة',
+//     rating: 4.8,
+//     reviewCount: 95,
+//     yearsExp: 6,
+//     hourlyRate: 120,
+//     isAvailable: true,
+//     avatarColors: [const Color(0xFF11998e), const Color(0xFF38ef7d)],
+//   ),
+//   _Item(
+//     id: '4',
+//     name: 'عمر سعيد',
+//     specialty: 'فني سباكة',
+//     rating: 4.7,
+//     reviewCount: 80,
+//     yearsExp: 5,
+//     hourlyRate: 110,
+//     isAvailable: false,
+//     avatarColors: [const Color(0xFFe74c3c), const Color(0xFFc0392b)],
+//   ),
+//   _Item(
+//     id: '5',
+//     name: 'يوسف محمود',
+//     specialty: 'فني سباكة',
+//     rating: 4.6,
+//     reviewCount: 62,
+//     yearsExp: 4,
+//     hourlyRate: 100,
+//     isAvailable: true,
+//     avatarColors: [const Color(0xFF9b59b6), const Color(0xFF8e44ad)],
+//   ),
+// ];
 
 // ══════════════════════════════════════════════════════════════
 // Layout router
@@ -125,9 +129,10 @@ abstract class _Base<T extends StatefulWidget> extends State<T>
   String get categoryId;
   String get categoryName;
   Color get accent => AppColors.primary[60]!;
+  String? search;
 
   int sortIndex = 0;
-  bool onlyAvailable = false;
+  bool onlyAvailable = true;
 
   late final AnimationController entryCtrl;
   late final Animation<double> headerFade;
@@ -138,6 +143,14 @@ abstract class _Base<T extends StatefulWidget> extends State<T>
   @override
   void initState() {
     super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<CustomerCubit>().getHandymen(
+        categoryId: categoryId,
+        availableOnly:  onlyAvailable,
+      );
+    });
+
     entryCtrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
@@ -180,35 +193,32 @@ abstract class _Base<T extends StatefulWidget> extends State<T>
     super.dispose();
   }
 
-  List<_Item> get items {
-    var list = List<_Item>.from(_kItems);
-    if (onlyAvailable) list = list.where((h) => h.isAvailable).toList();
+  List<HandymanListEntity> items(
+      List<HandymanListEntity> handymen,
+      ) {
+    final list = List<HandymanListEntity>.from(handymen);
+
     switch (sortIndex) {
       case 0:
         list.sort((a, b) => b.rating.compareTo(a.rating));
         break;
+
       case 2:
-        list.sort((a, b) => b.yearsExp.compareTo(a.yearsExp));
+        list.sort(
+              (a, b) => b.yearsOfExperience.compareTo(a.yearsOfExperience),
+        );
         break;
     }
+
     return list;
   }
 
-  // ── Filter bar (mobile) ───────────────────────────────────
   Widget buildFilterBar(bool isDark, AppLocalizations l10n) {
-    final sortLabels = [
-      l10n.categoryFilterTopRated,
-      l10n.categoryFilterNearest,
-      l10n.categoryFilterMostExp,
-    ];
-    final areaLabels = [
-      l10n.categoryFilterAllAreas,
-      l10n.areaNasr,
-      l10n.areaMaadi,
-      l10n.areaZamalek,
-      l10n.areaNewCairo,
-      l10n.areaHeliopolis,
-    ];
+    // final sortLabels = [
+    //   l10n.categoryFilterTopRated,
+    //   l10n.categoryFilterNearest,
+    //   l10n.categoryFilterMostExp,
+    // ];
 
     return FadeTransition(
       opacity: filterFade,
@@ -220,26 +230,62 @@ abstract class _Base<T extends StatefulWidget> extends State<T>
             vertical: AppSpacing.md.h,
           ),
           color: isDark ? AppColors.darkBgSecondary : Colors.white,
-          child: Row(
+          child: Column(
             children: [
-              Expanded(
-                child: _Dropdown(
-                  isDark: isDark,
-                  value: areaLabels[0],
-                  items: areaLabels,
-                  onChanged: (_) {},
+              TextField(
+                decoration: InputDecoration(
+                  hintText: l10n.searchAvailable,
+                  prefixIcon: const Icon(Icons.search_rounded),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                  isDense: true,
                 ),
+                onChanged: (value) {
+                  search = value.trim().isEmpty ? null : value.trim();
+
+                  context.read<CustomerCubit>().getHandymen(
+                    categoryId: categoryId,
+                    search: value.trim().isEmpty ? null : value.trim(),
+                    availableOnly: onlyAvailable,
+                  );
+                },
               ),
-              SizedBox(width: 12.w),
-              Expanded(
-                child: _Dropdown(
-                  isDark: isDark,
-                  value: sortLabels[sortIndex],
-                  items: sortLabels,
-                  onChanged: (v) =>
-                      setState(() => sortIndex = sortLabels.indexOf(v!)),
-                ),
-              ),
+
+              SizedBox(height: 12.h),
+
+              // SwitchListTile(
+              //   contentPadding: EdgeInsets.zero,
+              //   value: onlyAvailable,
+              //   activeColor: accent,
+              //   title: Text(
+              //     l10n.searchAvailable,
+              //     style: Theme.of(context).textTheme.bodyMedium,
+              //   ),
+              //   onChanged: (value) async {
+              //     setState(() => onlyAvailable = value);
+              //
+              //     await context.read<CustomerCubit>().getHandymen(
+              //       categoryId: categoryId,
+              //       search: search,
+              //       availableOnly: value ? true : null,
+              //     );
+              //   },
+              // ),
+
+
+              // _Dropdown(
+              //   isDark: isDark,
+              //   value: sortLabels[sortIndex],
+              //   items: sortLabels,
+              //   onChanged: (value) {
+              //     if (value == null) return;
+              //
+              //     setState(() {
+              //       sortIndex = sortLabels.indexOf(value);
+              //     });
+              //   },
+              // ),
             ],
           ),
         ),
@@ -269,64 +315,96 @@ class _MobileBodyState extends _Base<_MobileBody> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context)!;
-    final list = items;
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: AppMainBackground(
-        child: Column(
-          children: [
-            FadeTransition(
-              opacity: headerFade,
-              child: SlideTransition(
-                position: headerSlide,
-                child: AppPageHeader(
-                  isDark: isDark,
-                  accentColor: accent,
-                  title: '${l10n.categoryResultsTitlePrefix} $categoryName',
-                ),
+    return BlocBuilder<CustomerCubit, CustomerState>(
+      builder: (context, state) {
+        final cubit = context.watch<CustomerCubit>();
+        final list = items(cubit.handymen);
+        print(state.runtimeType);
+        Widget body;
+
+        if (state is CustomerLoading && cubit.handymen.isEmpty) {
+          body = const Center(
+            child: CircularProgressIndicator(),
+          );
+        } else if (state is CustomerError && cubit.handymen.isEmpty) {
+          body = Center(
+            child: AppEmptyState(
+              icon: Icons.error_outline_rounded,
+              title: 'Something went wrong',
+              subtitle: state.message,
+              color: accent,
+            ),
+          );
+        } else if (cubit.handymen.isEmpty) {
+          body = Center(
+            child: AppEmptyState(
+              icon: Icons.search_off_rounded,
+              title: l10n.categoryEmptyTitle,
+              subtitle: l10n.categoryEmptySubtitle,
+              color: accent,
+            ),
+          );
+        } else {
+          body = ListView.builder(
+            padding: EdgeInsets.fromLTRB(
+              AppSpacing.xl.w,
+              AppSpacing.lg.h,
+              AppSpacing.xl.w,
+              MediaQuery.of(context).padding.bottom + 100.h,
+            ),
+            itemCount: list.length,
+            itemBuilder: (_, i) => _Card(
+              item: list[i],
+              index: i,
+              isDark: isDark,
+              l10n: l10n,
+              onTap: () async {
+                await context
+                    .read<CustomerCubit>()
+                    .getHandymanDetails(list[i].id);
+
+                if (!context.mounted) return;
+
+                Navigator.of(context).pushNamed(
+                  AppRoutes.customerViewHandyman,
+                  arguments: list[i].id,
+                );
+              },
+              onBook: () => Navigator.of(context).pushNamed(
+                AppRoutes.customerBookService,
+                arguments: list[i].id,
               ),
             ),
+          );
+        }
 
-            buildFilterBar(isDark, l10n),
-
-            Expanded(
-              child: list.isEmpty
-                  ? Center(
-                      child: AppEmptyState(
-                        icon: Icons.search_off_rounded,
-                        title: l10n.categoryEmptyTitle,
-                        subtitle: l10n.categoryEmptySubtitle,
-                        color: accent,
-                      ),
-                    )
-                  : ListView.builder(
-                      padding: EdgeInsets.fromLTRB(
-                        AppSpacing.xl.w,
-                        AppSpacing.lg.h,
-                        AppSpacing.xl.w,
-                        MediaQuery.of(context).padding.bottom + 100.h,
-                      ),
-                      itemCount: list.length,
-                      itemBuilder: (_, i) => _Card(
-                        item: list[i],
-                        index: i,
-                        isDark: isDark,
-                        l10n: l10n,
-                        onTap: () => Navigator.of(context).pushNamed(
-                          AppRoutes.customerViewHandyman,
-                          arguments: list[i].id,
-                        ),
-                        onBook: () => Navigator.of(context).pushNamed(
-                          AppRoutes.customerBookService,
-                          arguments: list[i].id,
-                        ),
-                      ),
+        return Scaffold(
+          backgroundColor: Colors.transparent,
+          body: AppMainBackground(
+            child: Column(
+              children: [
+                FadeTransition(
+                  opacity: headerFade,
+                  child: SlideTransition(
+                    position: headerSlide,
+                    child: AppPageHeader(
+                      isDark: isDark,
+                      accentColor: accent,
+                      title:
+                      '${l10n.categoryResultsTitlePrefix} $categoryName',
                     ),
+                  ),
+                ),
+
+                buildFilterBar(isDark, l10n),
+
+                Expanded(child: body),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }
@@ -352,175 +430,230 @@ class _TabletBodyState extends _Base<_TabletBody> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context)!;
-    final list = items;
+    return BlocBuilder<CustomerCubit, CustomerState>(
+        builder: (context, state) {
+          final cubit = context.read<CustomerCubit>();
 
-    final sortLabels = [
-      l10n.categoryFilterTopRated,
-      l10n.categoryFilterNearest,
-      l10n.categoryFilterMostExp,
-    ];
-    final sortIcons = [
-      Icons.star_rounded,
-      Icons.location_on_rounded,
-      Icons.workspace_premium_rounded,
-    ];
+          final list = items(
+            cubit.handymen,
+          );
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: AppMainBackground(
-        child: Column(
-          children: [
-            FadeTransition(
-              opacity: headerFade,
-              child: SlideTransition(
-                position: headerSlide,
-                child: AppPageHeader(
-                  isDark: isDark,
-                  accentColor: accent,
-                  title: '${l10n.categoryResultsTitlePrefix} $categoryName',
+          if (cubit.handymen.isEmpty) {
+            return const Scaffold(
+              body: Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+          }
+
+          if (state is CustomerLoading) {
+            return const Scaffold(
+              body: Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+          }
+
+          if (state is CustomerError &&
+              cubit.handymen.isEmpty) {
+            return Scaffold(
+              body: Center(
+                child: AppEmptyState(
+                  icon: Icons.error_outline_rounded,
+                  title: 'Something went wrong',
+                  subtitle: state.message,
+                  color: accent,
                 ),
               ),
-            ),
-            Expanded(
-              child: Row(
+            );
+          }
+
+          if (cubit.handymen.isEmpty) {
+            return Scaffold(
+              body: Center(
+                child: AppEmptyState(
+                  icon: Icons.search_off_rounded,
+                  title: l10n.categoryEmptyTitle,
+                  subtitle: l10n.categoryEmptySubtitle,
+                  color: accent,
+                ),
+              ),
+            );
+          }
+
+          final sortLabels = [
+            l10n.categoryFilterTopRated,
+            l10n.categoryFilterNearest,
+            l10n.categoryFilterMostExp,
+          ];
+          final sortIcons = [
+            Icons.star_rounded,
+            Icons.location_on_rounded,
+            Icons.workspace_premium_rounded,
+          ];
+
+          return Scaffold(
+            backgroundColor: Colors.transparent,
+            body: AppMainBackground(
+              child: Column(
                 children: [
-                  // ── Sidebar ───────────────────────────────
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.28,
-                    child: FadeTransition(
-                      opacity: filterFade,
-                      child: SlideTransition(
-                        position:
-                            Tween<Offset>(
-                              begin: const Offset(-0.15, 0),
-                              end: Offset.zero,
-                            ).animate(
-                              CurvedAnimation(
-                                parent: entryCtrl,
-                                curve: const Interval(
-                                  0.18,
-                                  0.72,
-                                  curve: Curves.easeOutCubic,
-                                ),
-                              ),
-                            ),
-                        child: Container(
-                          height: double.infinity,
-                          color: isDark
-                              ? AppColors.darkBgSecondary.withOpacity(0.60)
-                              : Colors.white.withOpacity(0.70),
-                          padding: EdgeInsets.all(18.w),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                l10n.categoryFilterTopRated,
-                                style: Theme.of(context).textTheme.bodyLarge
-                                    ?.copyWith(fontWeight: FontWeight.w800),
-                              ),
-                              SizedBox(height: 14.h),
-
-                              // Sort tiles
-                              ...List.generate(sortLabels.length, (i) {
-                                final active = sortIndex == i;
-                                return GestureDetector(
-                                  onTap: () {
-                                    HapticFeedback.selectionClick();
-                                    setState(() => sortIndex = i);
-                                  },
-                                  child: AnimatedContainer(
-                                    duration: const Duration(milliseconds: 180),
-                                    margin: EdgeInsets.only(bottom: 8.h),
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 12.w,
-                                      vertical: 11.h,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: active
-                                          ? accent.withOpacity(0.10)
-                                          : Colors.transparent,
-                                      borderRadius: BorderRadius.circular(12.r),
-                                      border: Border.all(
-                                        color: active
-                                            ? accent.withOpacity(0.28)
-                                            : Colors.transparent,
-                                      ),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Icon(
-                                          sortIcons[i],
-                                          size: 18.sp,
-                                          color: active
-                                              ? accent
-                                              : Theme.of(
-                                                  context,
-                                                ).colorScheme.onSurfaceVariant,
-                                        ),
-                                        SizedBox(width: 10.w),
-                                        Flexible(
-                                          child: Text(
-                                            sortLabels[i],
-                                            style: GoogleFonts.cairo(
-                                              fontSize: 13.sp,
-                                              fontWeight: active
-                                                  ? FontWeight.w700
-                                                  : FontWeight.w500,
-                                              color: active
-                                                  ? accent
-                                                  : Theme.of(context)
-                                                        .colorScheme
-                                                        .onSurfaceVariant,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              }),
-
-                              SizedBox(height: 20.h),
-                              Divider(color: accent.withOpacity(0.10)),
-                              SizedBox(height: 16.h),
-
-                              // Available only switch
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      l10n.searchAvailable,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyMedium
-                                          ?.copyWith(
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                    ),
-                                  ),
-                                  Switch(
-                                    value: onlyAvailable,
-                                    activeThumbColor: accent,
-                                    onChanged: (v) {
-                                      HapticFeedback.selectionClick();
-                                      setState(() => onlyAvailable = v);
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
+                  FadeTransition(
+                    opacity: headerFade,
+                    child: SlideTransition(
+                      position: headerSlide,
+                      child: AppPageHeader(
+                        isDark: isDark,
+                        accentColor: accent,
+                        title: '${l10n.categoryResultsTitlePrefix} $categoryName',
                       ),
                     ),
                   ),
-
-                  VerticalDivider(width: 1, color: accent.withOpacity(0.08)),
-
-                  // ── List ──────────────────────────────────
                   Expanded(
-                    child: list.isEmpty
-                        ? Center(
+                    child: Row(
+                      children: [
+                        // ── Sidebar ───────────────────────────────
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.28,
+                          child: FadeTransition(
+                            opacity: filterFade,
+                            child: SlideTransition(
+                              position:
+                              Tween<Offset>(
+                                begin: const Offset(-0.15, 0),
+                                end: Offset.zero,
+                              ).animate(
+                                CurvedAnimation(
+                                  parent: entryCtrl,
+                                  curve: const Interval(
+                                    0.18,
+                                    0.72,
+                                    curve: Curves.easeOutCubic,
+                                  ),
+                                ),
+                              ),
+                              child: Container(
+                                height: double.infinity,
+                                color: isDark
+                                    ? AppColors.darkBgSecondary.withOpacity(0.60)
+                                    : Colors.white.withOpacity(0.70),
+                                padding: EdgeInsets.all(18.w),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      l10n.categoryFilterTopRated,
+                                      style: Theme.of(context).textTheme.bodyLarge
+                                          ?.copyWith(fontWeight: FontWeight.w800),
+                                    ),
+                                    SizedBox(height: 14.h),
+
+                                    // Sort tiles
+                                    ...List.generate(sortLabels.length, (i) {
+                                      final active = sortIndex == i;
+                                      return GestureDetector(
+                                        onTap: () {
+                                          HapticFeedback.selectionClick();
+                                          setState(() => sortIndex = i);
+                                        },
+                                        child: AnimatedContainer(
+                                          duration: const Duration(milliseconds: 180),
+                                          margin: EdgeInsets.only(bottom: 8.h),
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 12.w,
+                                            vertical: 11.h,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: active
+                                                ? accent.withOpacity(0.10)
+                                                : Colors.transparent,
+                                            borderRadius: BorderRadius.circular(12.r),
+                                            border: Border.all(
+                                              color: active
+                                                  ? accent.withOpacity(0.28)
+                                                  : Colors.transparent,
+                                            ),
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              Icon(
+                                                sortIcons[i],
+                                                size: 18.sp,
+                                                color: active
+                                                    ? accent
+                                                    : Theme.of(
+                                                  context,
+                                                ).colorScheme.onSurfaceVariant,
+                                              ),
+                                              SizedBox(width: 10.w),
+                                              Flexible(
+                                                child: Text(
+                                                  sortLabels[i],
+                                                  style: GoogleFonts.cairo(
+                                                    fontSize: 13.sp,
+                                                    fontWeight: active
+                                                        ? FontWeight.w700
+                                                        : FontWeight.w500,
+                                                    color: active
+                                                        ? accent
+                                                        : Theme.of(context)
+                                                        .colorScheme
+                                                        .onSurfaceVariant,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    }),
+
+                                    SizedBox(height: 20.h),
+                                    Divider(color: accent.withOpacity(0.10)),
+                                    SizedBox(height: 16.h),
+
+                                    // Available only switch
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            l10n.searchAvailable,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyMedium
+                                                ?.copyWith(
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                        Switch(
+                                          value: onlyAvailable,
+                                          activeThumbColor: accent,
+                                          onChanged: (v) {
+                                            HapticFeedback.selectionClick();
+                                            setState(() => onlyAvailable = v);
+
+                                            context.read<CustomerCubit>().getHandymen(
+                                              categoryId: categoryId,
+                                              search: search,
+                                              availableOnly: v ? true : null,
+                                            );
+                                            },
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        VerticalDivider(width: 1, color: accent.withOpacity(0.08)),
+
+                        // ── List ──────────────────────────────────
+                        Expanded(
+                          child: list.isEmpty
+                              ? Center(
                             child: AppEmptyState(
                               icon: Icons.search_off_rounded,
                               title: l10n.categoryEmptyTitle,
@@ -528,7 +661,7 @@ class _TabletBodyState extends _Base<_TabletBody> {
                               color: accent,
                             ),
                           )
-                        : ListView.builder(
+                              : ListView.builder(
                             padding: EdgeInsets.fromLTRB(
                               AppSpacing.xl.w,
                               AppSpacing.lg.h,
@@ -551,13 +684,15 @@ class _TabletBodyState extends _Base<_TabletBody> {
                               ),
                             ),
                           ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
-          ],
-        ),
-      ),
+          );
+        },
     );
   }
 }
@@ -570,7 +705,7 @@ class _TabletBodyState extends _Base<_TabletBody> {
 //   • One AnimationController per card (entry slide + fade)
 // ══════════════════════════════════════════════════════════════
 class _Card extends StatefulWidget {
-  final _Item item;
+  final HandymanListEntity item;
   final int index;
   final bool isDark;
   final AppLocalizations l10n;
@@ -679,7 +814,10 @@ class _CardState extends State<_Card> with SingleTickerProviderStateMixin {
                         gradient: LinearGradient(
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
-                          colors: h.avatarColors,
+                          colors: [
+                            AppColors.primary[60]!,
+                            AppColors.secondary[60]!,
+                          ],
                         ),
                         borderRadius: BorderRadius.circular(13.r),
                       ),
@@ -702,7 +840,7 @@ class _CardState extends State<_Card> with SingleTickerProviderStateMixin {
                           children: [
                             Expanded(
                               child: Text(
-                                h.name,
+                                h.fullName,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: textTheme.bodyLarge?.copyWith(
@@ -725,7 +863,7 @@ class _CardState extends State<_Card> with SingleTickerProviderStateMixin {
                         SizedBox(height: 4.h),
 
                         Text(
-                          h.specialty,
+                          h.category,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: textTheme.bodySmall?.copyWith(
@@ -761,12 +899,12 @@ class _CardState extends State<_Card> with SingleTickerProviderStateMixin {
                             _Chip(
                               icon: Icons.work_outline_rounded,
                               label:
-                                  '${h.yearsExp} ${widget.l10n.searchExpLabel}',
+                                  '${h.yearsOfExperience} ${widget.l10n.searchExpLabel}',
                             ),
                             _Chip(
                               icon: Icons.payments_outlined,
                               label:
-                                  '${h.hourlyRate} ${widget.l10n.searchCurrency}/${widget.l10n.searchRateLabel}',
+                                  '${h.basePrice.toInt()} ${widget.l10n.searchCurrency}/${widget.l10n.searchRateLabel}',
                             ),
                           ],
                         ),

@@ -102,11 +102,6 @@ abstract class _LoginBaseState<T extends StatefulWidget> extends State<T>
     });
 
     entryCtrl.forward();
-
-    // final customerCubit = context.read<CustomerCubit>();
-    // customerCubit.getProfile();
-    // customerCubit.getRequests();
-    // customerCubit.getStatistics();
   }
 
   @override
@@ -198,20 +193,6 @@ class _LoginMobileBodyState extends _LoginBaseState<LoginMobileBody> {
         state.whenOrNull(
 
           success: (user) async {
-
-            await getIt<SecureStorageService>().saveToken(user.token,);
-
-            await getIt<SecureStorageService>()
-                .saveRole(
-              user.role,
-            );
-
-            final token = await getIt<SecureStorageService>().getToken();
-
-            debugPrint(
-              'TOKEN => $token',
-            );
-
             AppSnackBar.show(
               context,
               message: 'Login successful',
@@ -340,7 +321,6 @@ class _LoginMobileBodyState extends _LoginBaseState<LoginMobileBody> {
                         ),
                         SizedBox(height: 20.h),
 
-                        // a(5, buildRoleSwitch()),
                         SizedBox(height: 24.h),
 
                         a(
@@ -401,14 +381,10 @@ class _LoginTabletBodyState extends _LoginBaseState<LoginTabletBody> {
 
           success: (user) async {
 
-            await getIt<SecureStorageService>()
-                .saveToken(
-              user.token,
-            );
-
-            await getIt<SecureStorageService>()
-                .saveRole(
-              user.role,
+            AppSnackBar.show(
+              context,
+              message: 'Login successful',
+              type: AppSnackType.success,
             );
 
             await setRememberMe(
@@ -613,7 +589,6 @@ class _LoginTabletBodyState extends _LoginBaseState<LoginTabletBody> {
                               ),
                               SizedBox(height: 24.h),
 
-                              // a(5, buildRoleSwitch()),
                               SizedBox(height: 24.h),
 
                               a(

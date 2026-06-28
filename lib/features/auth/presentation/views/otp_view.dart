@@ -13,6 +13,7 @@ import '../../../../core/utils/widgets/app_auth_background.dart';
 import '../../../../core/utils/widgets/app_otp_field.dart';
 import '../../../../core/utils/widgets/app_snack_bar.dart';
 import '../../../../core/utils/widgets/buttons/app_primary_button.dart';
+import '../../data/models/requests/forgot_password_request.dart';
 import '../../data/models/requests/verify_otp_request.dart';
 import '../cubit/auth_cubit.dart';
 import '../cubit/auth_state.dart';
@@ -22,14 +23,21 @@ import '../cubit/auth_state.dart';
 // ══════════════════════════════════════════════════════════════
 class OtpView extends StatelessWidget {
   final String? email;
-  const OtpView({super.key, this.email});
+  final String? sentOtp;
+
+  const OtpView({
+    super.key,
+    this.email,
+    this.sentOtp,
+  });
 
   @override
   Widget build(BuildContext context) {
+
     return LayoutBuilder(
       builder: (_, c) => c.maxWidth >= 600
-          ? OtpTabletBody(email: email)
-          : OtpMobileBody(email: email),
+          ? OtpTabletBody(email: email, sentOtp: sentOtp,)
+          : OtpMobileBody(email: email, sentOtp: sentOtp,),
     );
   }
 }
@@ -37,13 +45,13 @@ class OtpView extends StatelessWidget {
 // ══════════════════════════════════════════════════════════════
 // Shared base — all state, animations, logic
 // ══════════════════════════════════════════════════════════════
-abstract class _OtpBase<T extends StatefulWidget> extends State<T>
-    with TickerProviderStateMixin {
+abstract class _OtpBase<T extends StatefulWidget> extends State<T> with TickerProviderStateMixin {
   String? get email;
+  String? get sentOtp;
+  String otpCode = '';
+  String? currentOtp;
 
-  String otpCode  = '';
-
-  static const _timerDuration = 5 * 60;
+  static const _timerDuration = 3 * 60;
   int  secondsLeft = _timerDuration;
   bool canResend   = false;
   Timer? _timer;
@@ -71,6 +79,7 @@ abstract class _OtpBase<T extends StatefulWidget> extends State<T>
   @override
   void initState() {
     super.initState();
+    currentOtp = sentOtp;
     _startTimer();
 
     // Icon entry
@@ -142,16 +151,31 @@ abstract class _OtpBase<T extends StatefulWidget> extends State<T>
 
   // ── Timer ─────────────────────────────────────────────────
   void _startTimer() {
-    secondsLeft = _timerDuration;
-    canResend   = false;
-    _timer?.cancel();
-    _timer = Timer.periodic(const Duration(seconds: 1), (t) {
-      if (!mounted) { t.cancel(); return; }
-      setState(() {
-        if (secondsLeft > 0) { secondsLeft--; }
-        else { canResend = true; t.cancel(); }
-      });
+
+    setState(() {
+      secondsLeft = _timerDuration;
+      canResend = false;
     });
+
+    _timer?.cancel();
+
+    _timer = Timer.periodic(
+      const Duration(seconds: 1), (t) {
+        if (!mounted) {
+          t.cancel();
+          return;
+        }
+
+        setState(() {
+          if (secondsLeft > 0) {
+            secondsLeft--;
+          } else {
+            canResend = true;
+            t.cancel();
+          }
+        });
+      },
+    );
   }
 
   String get timerText {
@@ -183,13 +207,43 @@ abstract class _OtpBase<T extends StatefulWidget> extends State<T>
     );
   }
 
+  Widget buildOtpPreview() {
+
+    if (currentOtp == null || currentOtp!.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.orange.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Colors.orange,
+        ),
+      ),
+      child: Text(
+        'OTP: $currentOtp',
+        textAlign: TextAlign.center,
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
   void onResend(AppLocalizations l10n) {
+
     if (!canResend) return;
-    HapticFeedback.selectionClick();
+
+    context.read<AuthCubit>().forgotPassword(
+      ForgotPasswordRequest(
+        email: email!,
+      ),
+    );
+
     _startTimer();
-    AppSnackBar.show(context,
-        message: l10n.otpResentMessage,
-        type: AppSnackType.success);
+    debugPrint('AFTER RESEND => canResend = $canResend');
   }
 
   // ── Shared widgets ────────────────────────────────────────
@@ -322,7 +376,13 @@ abstract class _OtpBase<T extends StatefulWidget> extends State<T>
 // ══════════════════════════════════════════════════════════════
 class OtpMobileBody extends StatefulWidget {
   final String? email;
-  const OtpMobileBody({super.key, this.email});
+  final String? sentOtp;
+
+  const OtpMobileBody({
+    super.key,
+    this.email,
+    this.sentOtp,
+  });
 
   @override
   State<OtpMobileBody> createState() => _OtpMobileBodyState();
@@ -331,6 +391,8 @@ class OtpMobileBody extends StatefulWidget {
 class _OtpMobileBodyState extends _OtpBase<OtpMobileBody> {
   @override
   String? get email => widget.email;
+  @override
+  String? get sentOtp => widget.sentOtp;
 
   @override
   Widget build(BuildContext context) {
@@ -353,15 +415,27 @@ class _OtpMobileBodyState extends _OtpBase<OtpMobileBody> {
                 AppSnackType.success,
               );
 
-              Navigator
-                  .pushReplacementNamed(
+              Navigator.pushReplacementNamed(
                 context,
-                AppRoutes
-                    .resetPassword,
+                AppRoutes.resetPassword,
                 arguments: {
                   'email': email,
                   'otp': otpCode,
                 },
+              );
+            },
+
+            forgotPasswordSuccess: (message, token) {
+
+              setState(() {
+                currentOtp = token;
+                otpCode = '';
+              });
+
+              AppSnackBar.show(
+                context,
+                message: message,
+                type: AppSnackType.success,
               );
             },
 
@@ -428,14 +502,27 @@ class _OtpMobileBodyState extends _OtpBase<OtpMobileBody> {
                                             colorScheme: colorScheme,
                                           ),
                                         ),
+                                        SizedBox(height: 12.h),
+
+                                        if (sentOtp != null) ...[
+                                          buildOtpPreview(),
+                                          SizedBox(height: 16.h),
+                                        ],
                                         SizedBox(height: 36.h),
 
-                                        pa(
-                                          4,
+                                        pa(4,
                                           AppOtpField(
-                                            onChanged: (code) =>
-                                                setState(() => otpCode = code),
-                                            onCompleted: (_) => onVerify(l10n),
+                                            key: ValueKey(currentOtp),
+                                            onChanged: (code) {
+                                              setState(() {
+                                                otpCode = code;
+                                              });
+                                            },
+                                            onCompleted: (code) {
+                                              setState(() {
+                                                otpCode = code;
+                                              });
+                                            },
                                           ),
                                         ),
                                         SizedBox(height: 24.h),
@@ -452,8 +539,7 @@ class _OtpMobileBodyState extends _OtpBase<OtpMobileBody> {
                                             loading: () => true,
                                             orElse: () => false,
                                           ),
-                                          enabled: otpCode.length == 6,
-                                        ),
+                                          enabled: otpCode.length == 6 && !canResend,                                        ),
                                         SizedBox(height: 20.h),
 
                                         buildResend(context, l10n),
@@ -479,8 +565,13 @@ class _OtpMobileBodyState extends _OtpBase<OtpMobileBody> {
 // ══════════════════════════════════════════════════════════════
 class OtpTabletBody extends StatefulWidget {
   final String? email;
-  const OtpTabletBody({super.key, this.email});
+  final String? sentOtp;
 
+  const OtpTabletBody({
+    super.key,
+    this.email,
+    this.sentOtp,
+  });
   @override
   State<OtpTabletBody> createState() => _OtpTabletBodyState();
 }
@@ -488,6 +579,8 @@ class OtpTabletBody extends StatefulWidget {
 class _OtpTabletBodyState extends _OtpBase<OtpTabletBody> {
   @override
   String? get email => widget.email;
+  @override
+  String? get sentOtp => widget.sentOtp;
 
   @override
   Widget build(BuildContext context) {
@@ -512,18 +605,27 @@ class _OtpTabletBodyState extends _OtpBase<OtpTabletBody> {
                 AppSnackType.success,
               );
 
-              Navigator
-                  .pushReplacementNamed(
+              Navigator.pushReplacementNamed(
                 context,
-                AppRoutes
-                    .resetPassword,
+                AppRoutes.resetPassword,
                 arguments: {
-
                   'email': email,
-
                   'otp': otpCode,
-
                 },
+              );
+            },
+
+            forgotPasswordSuccess: (message, token) {
+
+              setState(() {
+                currentOtp = token;
+                otpCode = '';
+              });
+
+              AppSnackBar.show(
+                context,
+                message: message,
+                type: AppSnackType.success,
               );
             },
 
@@ -587,9 +689,18 @@ class _OtpTabletBodyState extends _OtpBase<OtpTabletBody> {
                               textTheme: textTheme, colorScheme: colorScheme)),
                           SizedBox(height: 36.h),
 
+                          if (sentOtp != null) ...[
+                            buildOtpPreview(),
+                            SizedBox(height: 16.h),
+                          ],
+
                           pa(4, AppOtpField(
                             onChanged: (code) => setState(() => otpCode = code),
-                            onCompleted: (_) => onVerify(l10n),
+                              onCompleted: (code) {
+                                setState(() {
+                                  otpCode = code;
+                                });
+                              },
                           )),
                           SizedBox(height: 24.h),
 
@@ -606,8 +717,7 @@ class _OtpTabletBodyState extends _OtpBase<OtpTabletBody> {
                               loading: () => true,
                               orElse: () => false,
                             ),
-                            enabled: otpCode.length == 6,
-                          ),
+                            enabled: otpCode.length == 6 && !canResend,                          ),
                           SizedBox(height: 20.h),
 
                           buildResend(context, l10n),

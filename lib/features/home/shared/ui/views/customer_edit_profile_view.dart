@@ -533,124 +533,161 @@ class _EditProfileTabletBodyState extends _EditProfileBase<_EditProfileTabletBod
     final l10n = AppLocalizations.of(context)!;
     final textTheme = Theme.of(context).textTheme;
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: AppMainBackground(
-        child: Form(
-          key: formKey,
-          child: Column(
-            children: [
-              animatedSection(0, buildHeader(isDark, l10n)),
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: EdgeInsets.all(AppSpacing.xl.w),
-                  child: Center(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 900),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Left column - Avatar + Tips
-                          Expanded(
-                            flex: 35,
-                            child: Column(
-                              children: [
-                                // Avatar card
-                                animatedSection(
-                                  1,
-                                  Container(
-                                    padding: EdgeInsets.all(20.w),
-                                    decoration: BoxDecoration(
-                                      color: isDark ? AppColors.darkSurface : Colors.white,
-                                      borderRadius: BorderRadius.circular(20.r),
-                                      border: Border.all(color: accentColor.withOpacity(0.08)),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(isDark ? 0.15 : 0.05),
-                                          blurRadius: 12,
-                                          offset: const Offset(0, 2),
+    return BlocListener<CustomerCubit, CustomerState>(
+        listener: (context, state) {
+          state.whenOrNull(
+            profileLoaded: (profile) {
+              nameCtrl.text = profile.fullName;
+              phoneCtrl.text = profile.phone;
+              emailCtrl.text = profile.email;
+              addressCtrl.text = profile.address;
+            },
+
+            message: (message) {
+              setState(() => isSaving = false);
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(message,style: TextStyle(color: Colors.white),),
+                  backgroundColor: AppColors.success,
+                ),
+              );
+
+              Navigator.pop(context);
+            },
+
+            error: (message) {
+              setState(() => isSaving = false);
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(message,style: TextStyle(color: Colors.white),),
+                  backgroundColor: AppColors.danger,
+                ),
+              );
+            },
+          );
+        },
+
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: AppMainBackground(
+            child: Form(
+              key: formKey,
+              child: Column(
+                children: [
+                  animatedSection(0, buildHeader(isDark, l10n)),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.all(AppSpacing.xl.w),
+                      child: Center(
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 900),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Left column - Avatar + Tips
+                              Expanded(
+                                flex: 35,
+                                child: Column(
+                                  children: [
+                                    // Avatar card
+                                    animatedSection(
+                                      1,
+                                      Container(
+                                        padding: EdgeInsets.all(20.w),
+                                        decoration: BoxDecoration(
+                                          color: isDark ? AppColors.darkSurface : Colors.white,
+                                          borderRadius: BorderRadius.circular(20.r),
+                                          border: Border.all(color: accentColor.withOpacity(0.08)),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withOpacity(isDark ? 0.15 : 0.05),
+                                              blurRadius: 12,
+                                              offset: const Offset(0, 2),
+                                            ),
+                                          ],
                                         ),
-                                      ],
-                                    ),
-                                    child: Column(
-                                      children: [
-                                        buildAvatar(l10n),
-                                        SizedBox(height: 16.h),
-                                        Text(
-                                          l10n.editProfilePhotoHint,
-                                          style: textTheme.bodySmall?.copyWith(
-                                            color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                          ),
-                                          textAlign: TextAlign.center,
+                                        child: Column(
+                                          children: [
+                                            buildAvatar(l10n),
+                                            SizedBox(height: 16.h),
+                                            Text(
+                                              l10n.editProfilePhotoHint,
+                                              style: textTheme.bodySmall?.copyWith(
+                                                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                          ],
                                         ),
-                                      ],
+                                      ),
                                     ),
-                                  ),
-                                ),
-                                SizedBox(height: 20.h),
+                                    SizedBox(height: 20.h),
 
-                                // Tips card
-                                animatedSection(
-                                  2,
-                                  _TipsCard(
-                                    accent: accentColor,
-                                    isDark: isDark,
-                                    textTheme: textTheme,
-                                    l10n: l10n,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(width: 24.w),
-
-                          // Right column - Form
-                          Expanded(
-                            flex: 65,
-                            child: Column(
-                              children: [
-                                // Personal info card
-                                animatedSection(
-                                  1,
-                                  buildSectionCard(
-                                    isDark: isDark,
-                                    title: l10n.editProfilePersonalSection,
-                                    icon: Icons.person_outline_rounded,
-                                    child: buildPersonalFields(isDark, l10n),
-                                  ),
-                                ),
-
-                                // Handyman-only: Professional info
-                                if (isHandyman) ...[
-                                  SizedBox(height: 20.h),
-                                  animatedSection(
-                                    2,
-                                    buildSectionCard(
-                                      isDark: isDark,
-                                      title: l10n.settingsProfessionalInfo,
-                                      icon: Icons.work_outline_rounded,
-                                      child: buildProfessionalFields(isDark, l10n),
+                                    // Tips card
+                                    animatedSection(
+                                      2,
+                                      _TipsCard(
+                                        accent: accentColor,
+                                        isDark: isDark,
+                                        textTheme: textTheme,
+                                        l10n: l10n,
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
+                              ),
+                              SizedBox(width: 24.w),
 
-                                SizedBox(height: 28.h),
+                              // Right column - Form
+                              Expanded(
+                                flex: 65,
+                                child: Column(
+                                  children: [
+                                    // Personal info card
+                                    animatedSection(
+                                      1,
+                                      buildSectionCard(
+                                        isDark: isDark,
+                                        title: l10n.editProfilePersonalSection,
+                                        icon: Icons.person_outline_rounded,
+                                        child: buildPersonalFields(isDark, l10n),
+                                      ),
+                                    ),
 
-                                // Save button
-                                animatedSection(3, buildSaveButton(l10n)),
-                              ],
-                            ),
+                                    // Handyman-only: Professional info
+                                    if (isHandyman) ...[
+                                      SizedBox(height: 20.h),
+                                      animatedSection(
+                                        2,
+                                        buildSectionCard(
+                                          isDark: isDark,
+                                          title: l10n.settingsProfessionalInfo,
+                                          icon: Icons.work_outline_rounded,
+                                          child: buildProfessionalFields(isDark, l10n),
+                                        ),
+                                      ),
+                                    ],
+
+                                    SizedBox(height: 28.h),
+
+                                    // Save button
+                                    animatedSection(3, buildSaveButton(l10n)),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
                     ),
                   ),
-                ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+        )
     );
   }
 }

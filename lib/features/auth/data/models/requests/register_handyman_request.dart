@@ -22,6 +22,8 @@ class RegisterHandymanRequest {
 
   final int yearsOfExperience;
 
+  final int basePrice;
+
   final String nationalIdImageUrl;
 
   const RegisterHandymanRequest({
@@ -36,7 +38,7 @@ class RegisterHandymanRequest {
     required this.addressLine,
     required this.categoryId,
     required this.yearsOfExperience,
-    required this.nationalIdImageUrl,
+    required this.nationalIdImageUrl, required this.basePrice,
   });
 
   factory RegisterHandymanRequest.fromJson(

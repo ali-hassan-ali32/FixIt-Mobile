@@ -797,5 +797,7 @@
   "resetPasswordReqSpecial": "At least one special character (!@#$%)",
   "resetPasswordRequirementsNotMet": "Password does not meet all requirements",
   "resetPasswordSaveButton": "Save Password",
-  "resetPasswordSuccessMessage": "Password changed successfully"
+  "resetPasswordSuccessMessage": "Password changed successfully",
+
+  "startJobBtn": "Start Job"
 }

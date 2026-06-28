@@ -4531,6 +4531,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Password changed successfully'**
   String get resetPasswordSuccessMessage;
+
+  /// No description provided for @startJobBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Job'**
+  String get startJobBtn;
 }
 
 class _AppLocalizationsDelegate

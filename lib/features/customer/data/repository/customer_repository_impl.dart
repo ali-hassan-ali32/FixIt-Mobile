@@ -4,16 +4,22 @@ import 'package:injectable/injectable.dart';
 
 import '../../../../core/network/failure.dart';
 
+import '../../../../core/utils/functions/extract_error_message.dart';
 import '../../domain/entities/customer_profile_entity.dart';
 import '../../domain/entities/customer_request_details_entity.dart';
 import '../../domain/entities/customer_request_summary_entity.dart';
 import '../../domain/entities/customer_statistics_entity.dart';
 
+import '../../domain/entities/handyman_details_entity.dart';
+import '../../domain/entities/handyman_list_entity.dart';
+import '../../domain/entities/portfolio_item_entity.dart';
+import '../../domain/entities/review_entity.dart';
 import '../../domain/repositories/customer_repository.dart';
 
 import '../datasource/customer_remote_data_source.dart';
 
 import '../models/requests/create_service_request.dart';
+import '../models/requests/review_request.dart';
 import '../models/requests/update_profile_request.dart';
 
 @Injectable(
@@ -43,16 +49,17 @@ class CustomerRepositoryImpl
     } on DioException catch (e) {
       return Left(
         Failure(
-          message:
-          e.response?.data?[
-          'ErrorMessage'] ??
-              'Failed To Get Profile',
+          message: extractErrorMessage(
+            e,
+            'Failed to get profile.',
+          ),
         ),
       );
-    } catch (e) {
-      return Left(
+    } catch (_) {
+      return const Left(
         Failure(
-          message: e.toString(),
+          message:
+          'Something went wrong. Please try again.',
         ),
       );
     }
@@ -71,16 +78,17 @@ class CustomerRepositoryImpl
     } on DioException catch (e) {
       return Left(
         Failure(
-          message:
-          e.response?.data?[
-          'ErrorMessage'] ??
-              'Failed To Update Profile',
+          message: extractErrorMessage(
+            e,
+            'Failed to update profile.',
+          ),
         ),
       );
-    } catch (e) {
-      return Left(
+    } catch (_) {
+      return const Left(
         Failure(
-          message: e.toString(),
+          message:
+          'Something went wrong. Please try again.',
         ),
       );
     }
@@ -108,16 +116,17 @@ class CustomerRepositoryImpl
     } on DioException catch (e) {
       return Left(
         Failure(
-          message:
-          e.response?.data?[
-          'ErrorMessage'] ??
-              'Failed To Get Requests',
+          message: extractErrorMessage(
+            e,
+            'Failed to load requests.',
+          ),
         ),
       );
-    } catch (e) {
-      return Left(
+    } catch (_) {
+      return const Left(
         Failure(
-          message: e.toString(),
+          message:
+          'Something went wrong. Please try again.',
         ),
       );
     }
@@ -138,16 +147,17 @@ class CustomerRepositoryImpl
     } on DioException catch (e) {
       return Left(
         Failure(
-          message:
-          e.response?.data?[
-          'ErrorMessage'] ??
-              'Failed To Create Request',
+          message: extractErrorMessage(
+            e,
+            'Failed to create request.',
+          ),
         ),
       );
-    } catch (e) {
-      return Left(
+    } catch (_) {
+      return const Left(
         Failure(
-          message: e.toString(),
+          message:
+          'Something went wrong. Please try again.',
         ),
       );
     }
@@ -174,16 +184,17 @@ class CustomerRepositoryImpl
     } on DioException catch (e) {
       return Left(
         Failure(
-          message:
-          e.response?.data?[
-          'ErrorMessage'] ??
-              'Failed To Get Request Details',
+          message: extractErrorMessage(
+            e,
+            'Failed to load request details.',
+          ),
         ),
       );
-    } catch (e) {
-      return Left(
+    } catch (_) {
+      return const Left(
         Failure(
-          message: e.toString(),
+          message:
+          'Something went wrong. Please try again.',
         ),
       );
     }
@@ -203,16 +214,17 @@ class CustomerRepositoryImpl
     } on DioException catch (e) {
       return Left(
         Failure(
-          message:
-          e.response?.data?[
-          'ErrorMessage'] ??
-              'Failed To Cancel Request',
+          message: extractErrorMessage(
+            e,
+            'Failed to cancel request.',
+          ),
         ),
       );
-    } catch (e) {
-      return Left(
+    } catch (_) {
+      return const Left(
         Failure(
-          message: e.toString(),
+          message:
+          'Something went wrong. Please try again.',
         ),
       );
     }
@@ -235,16 +247,242 @@ class CustomerRepositoryImpl
     } on DioException catch (e) {
       return Left(
         Failure(
-          message:
-          e.response?.data?[
-          'ErrorMessage'] ??
-              'Failed To Get Statistics',
+          message: extractErrorMessage(
+            e,
+            'Failed to load statistics.',
+          ),
         ),
       );
-    } catch (e) {
+    } catch (_) {
+      return const Left(
+        Failure(
+          message:
+          'Something went wrong. Please try again.',
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<PortfolioItemEntity>>>
+  getHandymanPortfolio(
+      String handymanId,
+      ) async {
+    try {
+      final response =
+      await remote.getHandymanPortfolio(
+        handymanId,
+      );
+
+      return Right(
+        response.map((e) => e.toEntity()).toList(),
+      );
+    } on DioException catch (e) {
       return Left(
         Failure(
-          message: e.toString(),
+          message: extractErrorMessage(
+            e,
+            'Failed to load portfolio.',
+          ),
+        ),
+      );
+    } catch (_) {
+      return const Left(
+        Failure(
+          message: 'Something went wrong. Please try again.',
+        ),
+      );
+    }
+  }
+
+
+  @override
+  Future<Either<Failure, HandymanDetailsEntity>>
+  getHandymanDetails(
+      String handymanId,
+      ) async {
+    try {
+      final response =
+      await remote.getHandymanDetails(
+        handymanId,
+      );
+
+      return Right(
+        response.toEntity(),
+      );
+    } on DioException catch (e) {
+      return Left(
+        Failure(
+          message: extractErrorMessage(
+            e,
+            'Failed to load handyman details.',
+          ),
+        ),
+      );
+    } catch (_) {
+      return const Left(
+        Failure(
+          message: 'Something went wrong. Please try again.',
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<HandymanListEntity>>>
+  getFeaturedHandymen() async {
+    try {
+      final response =
+      await remote.getFeaturedHandymen();
+
+      return Right(
+        response.map((e) => e.toEntity()).toList(),
+      );
+    } on DioException catch (e) {
+      return Left(
+        Failure(
+          message: extractErrorMessage(
+            e,
+            'Failed to load featured handymen.',
+          ),
+        ),
+      );
+    } catch (_) {
+      return const Left(
+        Failure(
+          message: 'Something went wrong. Please try again.',
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<HandymanListEntity>>> getHandymen({
+    String? search,
+    String? categoryId,
+    bool? availableOnly,
+  }) async {
+    try {
+      final response = await remote.getHandymen(
+        search: search,
+        categoryId: categoryId,
+        availableOnly: availableOnly,
+      );
+
+      return Right(
+        response.map((e) => e.toEntity()).toList(),
+      );
+    } on DioException catch (e) {
+      return Left(
+        Failure(
+          message: extractErrorMessage(
+            e,
+            'Failed to load handymen.',
+          ),
+        ),
+      );
+    } catch (_) {
+      return const Left(
+        Failure(
+          message: 'Something went wrong. Please try again.',
+        ),
+      );
+    }
+  }
+
+
+  @override
+  Future<Either<Failure, List<ReviewEntity>>>
+  getHandymanReviews(
+      String handymanId,
+      ) async {
+    try {
+      final response =
+      await remote.getHandymanReviews(
+        handymanId,
+      );
+
+      return Right(
+        response.map((e) => e.toEntity()).toList(),
+      );
+    } on DioException catch (e) {
+      return Left(
+        Failure(
+          message: extractErrorMessage(
+            e,
+            'Failed to load reviews.',
+          ),
+        ),
+      );
+    } catch (_) {
+      return const Left(
+        Failure(
+          message:
+          'Something went wrong. Please try again.',
+        ),
+      );
+    }
+  }
+
+
+  @override
+  Future<Either<Failure, void>>
+  addReview(
+      String requestId,
+      ReviewRequest request,
+      ) async {
+    try {
+      await remote.addReview(
+        requestId,
+        request,
+      );
+
+      return const Right(null);
+    } on DioException catch (e) {
+      return Left(
+        Failure(
+          message: extractErrorMessage(
+            e,
+            'Failed to add review.',
+          ),
+        ),
+      );
+    } catch (_) {
+      return const Left(
+        Failure(
+          message:
+          'Something went wrong. Please try again.',
+        ),
+      );
+    }
+  }
+
+
+
+  @override
+  Future<Either<Failure, List<ReviewEntity>>>
+  getMyReviews() async {
+    try {
+      final response =
+      await remote.getMyReviews();
+
+      return Right(
+        response.map((e) => e.toEntity()).toList(),
+      );
+    } on DioException catch (e) {
+      return Left(
+        Failure(
+          message: extractErrorMessage(
+            e,
+            'Failed to load reviews.',
+          ),
+        ),
+      );
+    } catch (_) {
+      return const Left(
+        Failure(
+          message:
+          'Something went wrong. Please try again.',
         ),
       );
     }

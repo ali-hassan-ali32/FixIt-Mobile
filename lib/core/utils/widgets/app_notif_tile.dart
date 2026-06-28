@@ -8,7 +8,49 @@ import '../../theme/app_sizes.dart';
 // Shared notification model + type
 // Used by CustomerNotificationsView & HandymanNotificationsView
 // ══════════════════════════════════════════════════════════════
-enum NotifType { booking, payment, system }
+
+/// Maps to the server's numeric `type` field:
+/// 1=General, 2=Welcome, 3=RequestCreated, 4=RequestAccepted,
+/// 5=RequestRejected, 6=JobStarted, 7=JobCompleted, 8=ReviewAdded
+enum NotifType {
+  general,        // 1
+  welcome,        // 2
+  requestCreated, // 3
+  requestAccepted,// 4
+  requestRejected,// 5
+  jobStarted,     // 6
+  jobCompleted,   // 7
+  reviewAdded;    // 8
+
+  static NotifType fromInt(int value) {
+    switch (value) {
+      case 1:  return NotifType.general;
+      case 2:  return NotifType.welcome;
+      case 3:  return NotifType.requestCreated;
+      case 4:  return NotifType.requestAccepted;
+      case 5:  return NotifType.requestRejected;
+      case 6:  return NotifType.jobStarted;
+      case 7:  return NotifType.jobCompleted;
+      case 8:  return NotifType.reviewAdded;
+      default: return NotifType.general;
+    }
+  }
+
+  bool get isBookingRelated => const {
+    NotifType.requestCreated,
+    NotifType.requestAccepted,
+    NotifType.requestRejected,
+    NotifType.jobStarted,
+    NotifType.jobCompleted,
+  }.contains(this);
+
+  bool get isSystemRelated => const {
+    NotifType.general,
+    NotifType.welcome,
+  }.contains(this);
+
+  bool get isReviewRelated => this == NotifType.reviewAdded;
+}
 
 class NotifModel {
   final String    id;

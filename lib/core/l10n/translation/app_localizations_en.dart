@@ -2327,4 +2327,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get resetPasswordSuccessMessage => 'Password changed successfully';
+
+  @override
+  String get startJobBtn => 'Start Job';
 }

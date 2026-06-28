@@ -19,7 +19,7 @@ class AppHandymanRequestCard extends StatefulWidget {
   final String date;
   final String time;
   final String area;
-  final String rate;
+  // final String rate;
   final String customerName;
   final String customerSub;
   final String description;
@@ -28,7 +28,7 @@ class AppHandymanRequestCard extends StatefulWidget {
   final String newLabel;
   final String acceptLabel;
   final String detailsLabel;
-  final VoidCallback onAccept;
+  // final VoidCallback onAccept;
   final VoidCallback onDetails;
 
   const AppHandymanRequestCard({
@@ -38,7 +38,7 @@ class AppHandymanRequestCard extends StatefulWidget {
     required this.date,
     required this.time,
     required this.area,
-    required this.rate,
+    // required this.rate,
     required this.customerName,
     required this.customerSub,
     required this.description,
@@ -47,7 +47,7 @@ class AppHandymanRequestCard extends StatefulWidget {
     required this.newLabel,
     required this.acceptLabel,
     required this.detailsLabel,
-    required this.onAccept,
+    // required this.onAccept,
     required this.onDetails,
   });
 
@@ -340,13 +340,14 @@ class _AppHandymanRequestCardState extends State<AppHandymanRequestCard> with Ti
             accentColor: teal,
           ),
           SizedBox(height: 8.h),
-          _DetailGridCell(
-            icon: Icons.attach_money_rounded,
-            label: 'الأجر',
-            value: widget.rate,
-            isDark: isDark,
-            accentColor: const Color(0xFFF7931E),
-          ),
+          //ToDo: Check: rate Later
+          // _DetailGridCell(
+          //   icon: Icons.attach_money_rounded,
+          //   label: 'الأجر',
+          //   value: widget.rate,
+          //   isDark: isDark,
+          //   accentColor: const Color(0xFFF7931E),
+          // ),
         ],
       );
     }
@@ -358,10 +359,10 @@ class _AppHandymanRequestCardState extends State<AppHandymanRequestCard> with Ti
     if (stacked) {
       return Column(
         children: [
-          SizedBox(
-            width: double.infinity,
-            child: _buildAcceptButton(isDark),
-          ),
+          // SizedBox(
+          //   width: double.infinity,
+          //   child: _buildAcceptButton(isDark),
+          // ),
           SizedBox(height: 10.h),
           SizedBox(
             width: double.infinity,
@@ -373,50 +374,50 @@ class _AppHandymanRequestCardState extends State<AppHandymanRequestCard> with Ti
 
     return Row(
       children: [
-        Expanded(child: _buildAcceptButton(isDark)),
+        // Expanded(child: _buildAcceptButton(isDark)),
         SizedBox(width: 10.w),
         Expanded(child: _buildDetailsButton(isDark)),
       ],
     );
   }
 
-  Widget _buildAcceptButton(bool isDark) {
-    return AppTapScale(
-      onTap: widget.onAccept,
-      borderRadius: BorderRadius.circular(14.r),
-      child: Container(
-        height: 50.h,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(colors: [teal, tealDark]),
-          borderRadius: BorderRadius.circular(14.r),
-          boxShadow: AppShadows.accent(color: teal),
-        ),
-        child: Center(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.check_circle_outline_rounded,
-                  size: _rsp(context, 18), color: Colors.white),
-              SizedBox(width: 8.w),
-              Flexible(
-                child: Text(
-                  widget.acceptLabel,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.cairo(
-                    fontSize: _rsp(context, 14),
-                    fontWeight: FontWeight.w800,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+  // Widget _buildAcceptButton(bool isDark) {
+  //   return AppTapScale(
+  //     onTap: widget.onAccept,
+  //     borderRadius: BorderRadius.circular(14.r),
+  //     child: Container(
+  //       height: 50.h,
+  //       decoration: BoxDecoration(
+  //         gradient: LinearGradient(colors: [teal, tealDark]),
+  //         borderRadius: BorderRadius.circular(14.r),
+  //         boxShadow: AppShadows.accent(color: teal),
+  //       ),
+  //       child: Center(
+  //         child: Row(
+  //           mainAxisAlignment: MainAxisAlignment.center,
+  //           mainAxisSize: MainAxisSize.min,
+  //           children: [
+  //             Icon(Icons.check_circle_outline_rounded,
+  //                 size: _rsp(context, 18), color: Colors.white),
+  //             SizedBox(width: 8.w),
+  //             Flexible(
+  //               child: Text(
+  //                 widget.acceptLabel,
+  //                 maxLines: 1,
+  //                 overflow: TextOverflow.ellipsis,
+  //                 style: GoogleFonts.cairo(
+  //                   fontSize: _rsp(context, 14),
+  //                   fontWeight: FontWeight.w800,
+  //                   color: Colors.white,
+  //                 ),
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget _buildDetailsButton(bool isDark) {
     return AppTapScale(
@@ -695,13 +696,14 @@ class _AppHandymanRequestCardState extends State<AppHandymanRequestCard> with Ti
             accentColor: teal,
           ),
           const SizedBox(height: 8),
-          _DetailGridCell(
-            icon: Icons.attach_money_rounded,
-            label: 'الأجر',
-            value: widget.rate,
-            isDark: isDark,
-            accentColor: const Color(0xFFF7931E),
-          ),
+          //ToDo: Check: rate Later
+          // _DetailGridCell(
+          //   icon: Icons.attach_money_rounded,
+          //   label: 'الأجر',
+          //   value: widget.rate,
+          //   isDark: isDark,
+          //   accentColor: const Color(0xFFF7931E),
+          // ),
         ],
       );
     }
@@ -744,15 +746,16 @@ class _AppHandymanRequestCardState extends State<AppHandymanRequestCard> with Ti
               ),
             ),
             const SizedBox(width: 8),
-            Expanded(
-              child: _DetailGridCell(
-                icon: Icons.attach_money_rounded,
-                label: 'الأجر',
-                value: widget.rate,
-                isDark: isDark,
-                accentColor: const Color(0xFFF7931E),
-              ),
-            ),
+            //ToDo: Check: rate Later
+            // Expanded(
+            //   child: _DetailGridCell(
+            //     icon: Icons.attach_money_rounded,
+            //     label: 'الأجر',
+            //     value: widget.rate,
+            //     isDark: isDark,
+            //     accentColor: const Color(0xFFF7931E),
+            //   ),
+            // ),
           ],
         ),
       ],
@@ -792,7 +795,7 @@ class _AppHandymanRequestCardState extends State<AppHandymanRequestCard> with Ti
   Widget _buildActionButtons(bool isDark, {required bool vertical}) {
     final acceptButton = Expanded(
       child: AppTapScale(
-        onTap: widget.onAccept,
+        // onTap: widget.onAccept,
         borderRadius: BorderRadius.circular(14),
         child: Container(
           height: 50,

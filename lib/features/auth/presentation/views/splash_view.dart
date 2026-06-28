@@ -153,7 +153,9 @@ abstract class _SplashState<T extends StatefulWidget> extends State<T>
 
       } else {
         Navigator.pushReplacementNamed(context, AppRoutes.login,);
-      }},
+      }
+      Navigator.pushReplacementNamed(context, AppRoutes.customerViewHandymanPortfolio,);
+    },
     );
   }
 

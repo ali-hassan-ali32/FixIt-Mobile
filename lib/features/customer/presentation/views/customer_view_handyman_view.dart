@@ -1,70 +1,76 @@
+import 'package:fix_it/features/customer/domain/entities/review_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/l10n/translation/app_localizations.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_sizes.dart';
+import '../../../../core/utils/widgets/app_empty_states.dart';
 import '../../../../core/utils/widgets/app_main_background.dart';
 import '../../../../core/utils/widgets/app_page_header.dart';
 import '../../../../core/utils/widgets/app_rating_star.dart';
 import '../../../../core/utils/widgets/buttons/app_gradient_button.dart';
 import '../../../../core/utils/widgets/cards/app_section_card.dart';
+import '../../domain/entities/handyman_details_entity.dart';
+import '../cubit/customer_cubit.dart';
+import '../cubit/customer_state.dart';
 
 // ══════════════════════════════════════════════════════════════
 // Models
 // ══════════════════════════════════════════════════════════════
-class HandymanProfileModel {
-  final String id;
-  final String name;
-  final String specialty;
-  final String hourlyRate;
-  final double rating;
-  final int reviewCount;
-  final String yearsExp;
-  final String completedJobs;
-  final String successRate;
-  final String about;
-  final List<String> services;
-  final String workArea;
-  final String workHours;
-  final List<Color> gradient;
-  final List<ReviewModel> reviews;
-  final int portfolioCount;
+// class HandymanProfileModel {
+//   final String id;
+//   final String name;
+//   final String specialty;
+//   final String hourlyRate;
+//   final double rating;
+//   final int reviewCount;
+//   final String yearsExp;
+//   final String completedJobs;
+//   final String successRate;
+//   final String about;
+//   final List<String> services;
+//   final String workArea;
+//   final String workHours;
+//   final List<Color> gradient;
+//   final List<ReviewModel> reviews;
+//   final int portfolioCount;
+//
+//   const HandymanProfileModel({
+//     required this.id,
+//     required this.name,
+//     required this.specialty,
+//     required this.hourlyRate,
+//     required this.rating,
+//     required this.reviewCount,
+//     required this.yearsExp,
+//     required this.completedJobs,
+//     required this.successRate,
+//     required this.about,
+//     required this.services,
+//     required this.workArea,
+//     required this.workHours,
+//     required this.gradient,
+//     required this.reviews,
+//     this.portfolioCount = 0,
+//   });
+// }
 
-  const HandymanProfileModel({
-    required this.id,
-    required this.name,
-    required this.specialty,
-    required this.hourlyRate,
-    required this.rating,
-    required this.reviewCount,
-    required this.yearsExp,
-    required this.completedJobs,
-    required this.successRate,
-    required this.about,
-    required this.services,
-    required this.workArea,
-    required this.workHours,
-    required this.gradient,
-    required this.reviews,
-    this.portfolioCount = 0,
-  });
-}
-
-class ReviewModel {
-  final String name;
-  final double rating;
-  final String text;
-  final String date;
-  const ReviewModel({
-    required this.name,
-    required this.rating,
-    required this.text,
-    required this.date,
-  });
-}
+// class ReviewModel {
+//   final String name;
+//   final double rating;
+//   final String text;
+//   final String date;
+//   const ReviewModel({
+//     required this.name,
+//     required this.rating,
+//     required this.text,
+//     required this.date,
+//   });
+// }
 
 // ══════════════════════════════════════════════════════════════
 // CustomerViewHandymanView — layout router
@@ -91,7 +97,7 @@ abstract class _HandymanBase<T extends StatefulWidget> extends State<T>
   String? get handymanId;
   Color get accent => AppColors.primary[60]!;
 
-  HandymanProfileModel? _handyman;
+  // HandymanProfileModel? _handyman;
 
   // Avatar elastic + content stagger
   late final AnimationController entryCtrl;
@@ -103,6 +109,14 @@ abstract class _HandymanBase<T extends StatefulWidget> extends State<T>
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final cubit = context.read<CustomerCubit>();
+
+      cubit.getHandymanDetails(handymanId!);
+      cubit.getHandymanPortfolio(handymanId!);
+      cubit.getHandymanReviews(handymanId!);
+    });
+
     entryCtrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 750),
@@ -155,53 +169,53 @@ abstract class _HandymanBase<T extends StatefulWidget> extends State<T>
     );
   }
 
-  HandymanProfileModel getHandyman(AppLocalizations l10n) {
-    _handyman ??= HandymanProfileModel(
-      id: handymanId ?? '1',
-      name: 'محمد علي',
-      specialty: l10n.handymanSpecialtyPlumber,
-      hourlyRate: '١٥٠ ج / ساعة',
-      rating: 4.9,
-      reviewCount: 128,
-      yearsExp: '٨+',
-      completedJobs: '٢٤٠+',
-      successRate: '٩٨٪',
-      about: l10n.handymanAboutText,
-      services: [
-        l10n.serviceLeak,
-        l10n.servicePipes,
-        l10n.serviceSanitary,
-        l10n.serviceDrainage,
-        l10n.serviceHeater,
-        l10n.serviceWaterNet,
-      ],
-      workArea: l10n.handymanWorkArea,
-      workHours: l10n.handymanWorkHours,
-      gradient: [AppColors.primary[60]!, AppColors.secondary[60]!],
-      portfolioCount: 5,
-      reviews: [
-        ReviewModel(
-          name: 'أحمد محمود',
-          rating: 5,
-          text: l10n.review1Text,
-          date: l10n.reviewDate1Week,
-        ),
-        ReviewModel(
-          name: 'فاطمة حسن',
-          rating: 5,
-          text: l10n.review2Text,
-          date: l10n.reviewDate2Weeks,
-        ),
-        ReviewModel(
-          name: 'خالد إبراهيم',
-          rating: 5,
-          text: l10n.review3Text,
-          date: l10n.reviewDate3Weeks,
-        ),
-      ],
-    );
-    return _handyman!;
-  }
+  // HandymanProfileModel getHandyman(AppLocalizations l10n) {
+  //   _handyman ??= HandymanProfileModel(
+  //     id: handymanId ?? '1',
+  //     name: 'محمد علي',
+  //     specialty: l10n.handymanSpecialtyPlumber,
+  //     hourlyRate: '١٥٠ ج / ساعة',
+  //     rating: 4.9,
+  //     reviewCount: 128,
+  //     yearsExp: '٨+',
+  //     completedJobs: '٢٤٠+',
+  //     successRate: '٩٨٪',
+  //     about: l10n.handymanAboutText,
+  //     services: [
+  //       l10n.serviceLeak,
+  //       l10n.servicePipes,
+  //       l10n.serviceSanitary,
+  //       l10n.serviceDrainage,
+  //       l10n.serviceHeater,
+  //       l10n.serviceWaterNet,
+  //     ],
+  //     workArea: l10n.handymanWorkArea,
+  //     workHours: l10n.handymanWorkHours,
+  //     gradient: [AppColors.primary[60]!, AppColors.secondary[60]!],
+  //     portfolioCount: 5,
+  //     reviews: [
+  //       ReviewModel(
+  //         name: 'أحمد محمود',
+  //         rating: 5,
+  //         text: l10n.review1Text,
+  //         date: l10n.reviewDate1Week,
+  //       ),
+  //       ReviewModel(
+  //         name: 'فاطمة حسن',
+  //         rating: 5,
+  //         text: l10n.review2Text,
+  //         date: l10n.reviewDate2Weeks,
+  //       ),
+  //       ReviewModel(
+  //         name: 'خالد إبراهيم',
+  //         rating: 5,
+  //         text: l10n.review3Text,
+  //         date: l10n.reviewDate3Weeks,
+  //       ),
+  //     ],
+  //   );
+  //   return _handyman!;
+  // }
 
   void showReviewModal(BuildContext context, String name) {
     showModalBottomSheet(
@@ -215,13 +229,17 @@ abstract class _HandymanBase<T extends StatefulWidget> extends State<T>
   // ── Shared card builders ──────────────────────────────────
 
   Widget buildProfileCard(
-    BuildContext context,
-    bool isDark,
-    AppLocalizations l10n,
-  ) {
-    final h = _handyman!;
+      BuildContext context,
+      bool isDark,
+      AppLocalizations l10n,
+      HandymanDetailsEntity handyman,
+      )
+  {
+    final h = handyman;
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
+    final statues = context.watch<CustomerCubit>().statisticsData;
+    final successRate = (statues?.completedRequests ?? 0.0 / (statues?.totalRequests ?? 0));
 
     return AppSectionCard(
       isDark: isDark,
@@ -238,7 +256,7 @@ abstract class _HandymanBase<T extends StatefulWidget> extends State<T>
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: h.gradient,
+                    colors: [AppColors.accent[60]!, AppColors.accent[70]!],
                   ),
                   borderRadius: BorderRadius.circular(20.r),
                   boxShadow: [
@@ -259,14 +277,14 @@ abstract class _HandymanBase<T extends StatefulWidget> extends State<T>
           ),
           SizedBox(height: 14.h),
           Text(
-            h.name,
+            h.fullName,
             style: textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.w800,
             ),
           ),
           SizedBox(height: 4.h),
           Text(
-            h.specialty,
+            h.category,
             style: textTheme.bodyMedium?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),
@@ -279,7 +297,7 @@ abstract class _HandymanBase<T extends StatefulWidget> extends State<T>
               borderRadius: BorderRadius.circular(20.r),
             ),
             child: Text(
-              h.hourlyRate,
+              h.basePrice.toString(),
               style: GoogleFonts.cairo(
                 fontSize: 13.sp,
                 fontWeight: FontWeight.w800,
@@ -288,10 +306,10 @@ abstract class _HandymanBase<T extends StatefulWidget> extends State<T>
             ),
           ),
           SizedBox(height: 14.h),
-          AppRatingStars(rating: h.rating, starSize: 20, showValue: true),
+          AppRatingStars(rating: h.averageRating, starSize: 20, showValue: true),
           SizedBox(height: 4.h),
           Text(
-            '(${h.reviewCount} ${l10n.handymanReviewsLabel})',
+            '(${h.reviewsCount} ${l10n.handymanReviewsLabel})',
             style: textTheme.bodySmall?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),
@@ -302,19 +320,19 @@ abstract class _HandymanBase<T extends StatefulWidget> extends State<T>
           Row(
             children: [
               Expanded(
-                child: _Stat(value: h.yearsExp, label: l10n.handymanStatYears),
+                child: _Stat(value: h.yearsOfExperience.toString(), label: l10n.handymanStatYears),
               ),
               _VDiv(),
               Expanded(
                 child: _Stat(
-                  value: h.completedJobs,
+                  value: statues?.completedRequests.toString() ?? '0.0',
                   label: l10n.handymanStatJobs,
                 ),
               ),
               _VDiv(),
               Expanded(
                 child: _Stat(
-                  value: h.successRate,
+                  value: successRate == 0 ? 'N/A': successRate.toString(),
                   label: l10n.handymanStatSuccess,
                 ),
               ),
@@ -326,9 +344,10 @@ abstract class _HandymanBase<T extends StatefulWidget> extends State<T>
   }
 
   Widget buildAboutCard(
-    BuildContext context,
-    bool isDark,
-    AppLocalizations l10n,
+      BuildContext context,
+      bool isDark,
+      AppLocalizations l10n,
+      HandymanDetailsEntity handyman
   ) {
     final colorScheme = Theme.of(context).colorScheme;
     return AppSectionCard(
@@ -342,7 +361,7 @@ abstract class _HandymanBase<T extends StatefulWidget> extends State<T>
           ),
           SizedBox(height: 12.h),
           Text(
-            _handyman!.about,
+            handyman.bio ?? 'No Bio',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: colorScheme.onSurfaceVariant,
               height: 1.65,
@@ -354,9 +373,10 @@ abstract class _HandymanBase<T extends StatefulWidget> extends State<T>
   }
 
   Widget buildServicesCard(
-    BuildContext context,
-    bool isDark,
-    AppLocalizations l10n,
+      BuildContext context,
+      bool isDark,
+      AppLocalizations l10n,
+      HandymanDetailsEntity handyman
   ) {
     return AppSectionCard(
       isDark: isDark,
@@ -371,9 +391,7 @@ abstract class _HandymanBase<T extends StatefulWidget> extends State<T>
           Wrap(
             spacing: 8.w,
             runSpacing: 8.h,
-            children: _handyman!.services
-                .map((s) => _ServiceBadge(label: s))
-                .toList(),
+            children: <Widget>[_ServiceBadge(label: handyman.category)]
           ),
         ],
       ),
@@ -384,8 +402,9 @@ abstract class _HandymanBase<T extends StatefulWidget> extends State<T>
     BuildContext context,
     bool isDark,
     AppLocalizations l10n,
-  ) {
-    final count = _handyman!.portfolioCount;
+      HandymanDetailsEntity handyman
+      ) {
+    final count = context.watch<CustomerCubit>().portfolio.length;
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -438,7 +457,7 @@ abstract class _HandymanBase<T extends StatefulWidget> extends State<T>
             onTap: count > 0
                 ? () => Navigator.of(context).pushNamed(
                     AppRoutes.customerViewHandymanPortfolio,
-                    arguments: _handyman!.id,
+                    arguments: handyman.id,
                   )
                 : null,
           ),
@@ -451,7 +470,8 @@ abstract class _HandymanBase<T extends StatefulWidget> extends State<T>
     BuildContext context,
     bool isDark,
     AppLocalizations l10n,
-  ) {
+      HandymanDetailsEntity handyman
+      ) {
     return AppSectionCard(
       isDark: isDark,
       child: Column(
@@ -462,32 +482,32 @@ abstract class _HandymanBase<T extends StatefulWidget> extends State<T>
             label: l10n.handymanContactTitle,
           ),
           SizedBox(height: 4.h),
-          _InfoRow(
-            icon: Icons.phone_outlined,
-            iconColor: Colors.grey,
-            label: l10n.handymanPhoneLabel,
-            value: l10n.handymanPhoneHidden,
-            valueColor: Colors.grey,
-            isDark: isDark,
-            isLast: false,
-            isPrivate: true,
-          ),
+          // _InfoRow(
+          //   icon: Icons.phone_outlined,
+          //   iconColor: Colors.grey,
+          //   label: l10n.handymanPhoneLabel,
+          //   value: l10n.handymanPhoneHidden,
+          //   valueColor: Colors.grey,
+          //   isDark: isDark,
+          //   isLast: false,
+          //   isPrivate: true,
+          // ),
           _InfoRow(
             icon: Icons.location_on_rounded,
             iconColor: accent,
             label: l10n.handymanAreaLabel,
-            value: _handyman!.workArea,
-            isDark: isDark,
-            isLast: false,
-          ),
-          _InfoRow(
-            icon: Icons.access_time_rounded,
-            iconColor: accent,
-            label: l10n.handymanHoursLabel,
-            value: _handyman!.workHours,
+            value: '${handyman.city} - ${handyman.region}',
             isDark: isDark,
             isLast: true,
           ),
+          // _InfoRow(
+          //   icon: Icons.access_time_rounded,
+          //   iconColor: accent,
+          //   label: l10n.handymanHoursLabel,
+          //   value: handyman.yearsOfExperience,
+          //   isDark: isDark,
+          //   isLast: true,
+          // ),
         ],
       ),
     );
@@ -497,7 +517,8 @@ abstract class _HandymanBase<T extends StatefulWidget> extends State<T>
     BuildContext context,
     bool isDark,
     AppLocalizations l10n,
-  ) {
+      HandymanDetailsEntity handyman
+      ) {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
     return AppSectionCard(
@@ -510,7 +531,7 @@ abstract class _HandymanBase<T extends StatefulWidget> extends State<T>
             label: l10n.handymanReviewsTitle,
           ),
           SizedBox(height: 12.h),
-          ..._handyman!.reviews.asMap().entries.map(
+          ...context.watch<CustomerCubit>().handymanReviews.asMap().entries.map(
             (e) => _ReviewTile(
               review: e.value,
               index: e.key,
@@ -525,7 +546,7 @@ abstract class _HandymanBase<T extends StatefulWidget> extends State<T>
             accentColor: accent,
             onTap: () => Navigator.of(context).pushNamed(
               AppRoutes.customerViewHandymanReviews,
-              arguments: _handyman!.id,
+              arguments: handyman.id,
             ),
           ),
         ],
@@ -537,7 +558,8 @@ abstract class _HandymanBase<T extends StatefulWidget> extends State<T>
     BuildContext context,
     bool isDark,
     AppLocalizations l10n,
-  ) {
+      HandymanDetailsEntity handyman,
+      ) {
     return Container(
       padding: EdgeInsets.fromLTRB(
         AppSpacing.xl.w,
@@ -565,7 +587,7 @@ abstract class _HandymanBase<T extends StatefulWidget> extends State<T>
               label: l10n.handymanWriteReview,
               icon: Icons.edit_outlined,
               isSecondary: true,
-              onTap: () => showReviewModal(context, _handyman!.name),
+              onTap: () => showReviewModal(context, handyman.fullName),
             ),
           ),
           SizedBox(width: 12.w),
@@ -604,56 +626,84 @@ class _HandymanMobileBodyState extends _HandymanBase<_HandymanMobileBody> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context)!;
-    getHandyman(l10n);
+    final cubit = context.watch<CustomerCubit>();
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: AppMainBackground(
-        child: Stack(
-          children: [
-            CustomScrollView(
-              slivers: [
-                SliverToBoxAdapter(
-                  child: AppPageHeader(
-                    isDark: isDark,
-                    accentColor: accent,
-                    title: l10n.handymanProfileTitle,
-                  ),
+    final handyman = cubit.handymanDetails!;
+
+    return BlocBuilder<CustomerCubit, CustomerState>(
+      builder: (context, state) {
+
+        if (cubit.handymanDetails == null && state is CustomerLoading) {
+          return const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+
+        if (state is CustomerError && cubit.handymanDetails == null) {
+          return Scaffold(
+            body: Center(
+              child: AppEmptyState(
+                icon: Icons.error_outline,
+                title: 'Something went wrong',
+                subtitle: state.message,
+                color: accent,
+              ),
+            ),
+          );
+        }
+
+        return Scaffold(
+          backgroundColor: Colors.transparent,
+          body: AppMainBackground(
+            child: Stack(
+              children: [
+                CustomScrollView(
+                  slivers: [
+                    SliverToBoxAdapter(
+                      child: AppPageHeader(
+                        isDark: isDark,
+                        accentColor: accent,
+                        title: l10n.handymanProfileTitle,
+                      ),
+                    ),
+                    SliverPadding(
+                      padding: EdgeInsets.fromLTRB(
+                        AppSpacing.xl.w,
+                        AppSpacing.md.h,
+                        AppSpacing.xl.w,
+                        180.h,
+                      ),
+                      sliver: SliverList(
+                        delegate: SliverChildListDelegate([
+                          buildProfileCard(context, isDark, l10n,handyman),
+                          SizedBox(height: 16.h),
+                          sa(0, buildAboutCard(context, isDark, l10n,handyman)),
+                          SizedBox(height: 16.h),
+                          sa(1, buildServicesCard(context, isDark, l10n,handyman)),
+                          SizedBox(height: 16.h),
+                          sa(2, buildPortfolioCard(context, isDark, l10n,handyman)),
+                          SizedBox(height: 16.h),
+                          sa(3, buildContactCard(context, isDark, l10n,handyman)),
+                          SizedBox(height: 16.h),
+                          sa(4, buildReviewsCard(context, isDark, l10n,handyman)),
+                        ]),
+                      ),
+                    ),
+                  ],
                 ),
-                SliverPadding(
-                  padding: EdgeInsets.fromLTRB(
-                    AppSpacing.xl.w,
-                    AppSpacing.md.h,
-                    AppSpacing.xl.w,
-                    180.h,
-                  ),
-                  sliver: SliverList(
-                    delegate: SliverChildListDelegate([
-                      buildProfileCard(context, isDark, l10n),
-                      SizedBox(height: 16.h),
-                      sa(0, buildAboutCard(context, isDark, l10n)),
-                      SizedBox(height: 16.h),
-                      sa(1, buildServicesCard(context, isDark, l10n)),
-                      SizedBox(height: 16.h),
-                      sa(2, buildPortfolioCard(context, isDark, l10n)),
-                      SizedBox(height: 16.h),
-                      sa(3, buildContactCard(context, isDark, l10n)),
-                      SizedBox(height: 16.h),
-                      sa(4, buildReviewsCard(context, isDark, l10n)),
-                    ]),
-                  ),
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: buildActionBar(context, isDark, l10n,handyman),
                 ),
               ],
             ),
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: buildActionBar(context, isDark, l10n),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+        },
     );
   }
 }
@@ -677,7 +727,9 @@ class _HandymanTabletBodyState extends _HandymanBase<_HandymanTabletBody> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context)!;
-    getHandyman(l10n);
+    // getHandyman(l10n);
+    final cubit = context.watch<CustomerCubit>();
+    final handyman = cubit.handymanDetails!;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -701,10 +753,10 @@ class _HandymanTabletBodyState extends _HandymanBase<_HandymanTabletBody> {
                         Expanded(
                           child: SingleChildScrollView(
                             padding: EdgeInsets.all(AppSpacing.xl.w),
-                            child: buildProfileCard(context, isDark, l10n),
+                            child: buildProfileCard(context, isDark, l10n,handyman),
                           ),
                         ),
-                        buildActionBar(context, isDark, l10n),
+                        buildActionBar(context, isDark, l10n,handyman),
                       ],
                     ),
                   ),
@@ -719,15 +771,15 @@ class _HandymanTabletBodyState extends _HandymanBase<_HandymanTabletBody> {
                           padding: EdgeInsets.all(AppSpacing.xl.w),
                           sliver: SliverList(
                             delegate: SliverChildListDelegate([
-                              sa(0, buildAboutCard(context, isDark, l10n)),
+                              sa(0, buildAboutCard(context, isDark, l10n,handyman)),
                               SizedBox(height: 16.h),
-                              sa(1, buildServicesCard(context, isDark, l10n)),
+                              sa(1, buildServicesCard(context, isDark, l10n,handyman)),
                               SizedBox(height: 16.h),
-                              sa(2, buildPortfolioCard(context, isDark, l10n)),
+                              sa(2, buildPortfolioCard(context, isDark, l10n,handyman)),
                               SizedBox(height: 16.h),
-                              sa(3, buildContactCard(context, isDark, l10n)),
+                              sa(3, buildContactCard(context, isDark, l10n,handyman)),
                               SizedBox(height: 16.h),
-                              sa(4, buildReviewsCard(context, isDark, l10n)),
+                              sa(4, buildReviewsCard(context, isDark, l10n,handyman)),
                               SizedBox(height: 32.h),
                             ]),
                           ),
@@ -1118,7 +1170,7 @@ class _InfoRow extends StatelessWidget {
 }
 
 class _ReviewTile extends StatelessWidget {
-  final ReviewModel review;
+  final ReviewEntity review;
   final int index;
   final bool isDark;
   final TextTheme textTheme;
@@ -1147,13 +1199,13 @@ class _ReviewTile extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                review.name,
+                review.customerName,
                 style: textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                 ),
               ),
               AppRatingStars(
-                rating: review.rating,
+                rating: review.rating.toDouble(),
                 starSize: 13,
                 showValue: false,
               ),
@@ -1161,7 +1213,7 @@ class _ReviewTile extends StatelessWidget {
           ),
           SizedBox(height: 6.h),
           Text(
-            review.text,
+            review.comment,
             style: textTheme.bodySmall?.copyWith(
               color: colorScheme.onSurfaceVariant,
               height: 1.5,
@@ -1169,7 +1221,7 @@ class _ReviewTile extends StatelessWidget {
           ),
           SizedBox(height: 4.h),
           Text(
-            review.date,
+            review.createdAt.toString(),
             style: GoogleFonts.cairo(
               fontSize: 11.sp,
               color: colorScheme.onSurfaceVariant.withOpacity(0.60),

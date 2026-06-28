@@ -22,7 +22,6 @@ sealed class AppRoutes {
   static const String sharedFaqQuality                = '/faq-quality';
 
   // Customer
-  static const String customerEditProfileView         = '/customer-edit-profile';
   static const String customerHome                    = '/customer-home';
   static const String customerNotifications           = '/customer-notifications';
   static const String customerBrowseCategories        = '/customer-browse-categories';
@@ -39,6 +38,8 @@ sealed class AppRoutes {
   static const String customerViewHandymanPortfolio   = '/customer-view-handyman-portfolio';
   static const String customerViewHandymanReviews     = '/customer-view-handyman-reviews';
   static const String customerCategorySearchResults   = '/customer-category-search-results';
+  static const String customerEditProfileView         = '/customer-edit-profile';
+
 
   // Handyman
   static const String handymanHome                    = '/handyman-home';
@@ -52,4 +53,5 @@ sealed class AppRoutes {
   static const String handymanOwnReviews              = '/handyman-own-reviews';
   static const String handymanUpdateJobStatus         = '/handyman-update-job-status';
   static const String handymanCompletedJobs           = '/handyman-completed-jobs';
+  static const String handymanEditProfileView         = '/handyman-edit-profile';
 }

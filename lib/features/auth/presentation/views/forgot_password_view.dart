@@ -163,8 +163,11 @@ class _ForgotPasswordMobileBodyState
         listener: (context, state) {
 
           state.whenOrNull(
+            success: (user) {
 
-            message: (message) {
+            },
+
+            forgotPasswordSuccess: (message, token) {
 
               AppSnackBar.show(
                 context,
@@ -177,6 +180,7 @@ class _ForgotPasswordMobileBodyState
                 AppRoutes.otp,
                 arguments: {
                   'email': emailCtrl.text.trim(),
+                  'sentOtp': token,
                 },
               );
             },
@@ -298,8 +302,7 @@ class ForgotPasswordTabletBody extends StatefulWidget {
       _ForgotPasswordTabletBodyState();
 }
 
-class _ForgotPasswordTabletBodyState
-    extends _ForgotBase<ForgotPasswordTabletBody> {
+class _ForgotPasswordTabletBodyState extends _ForgotBase<ForgotPasswordTabletBody> {
 
   @override
   Widget build(BuildContext context) {
@@ -312,22 +315,23 @@ class _ForgotPasswordTabletBodyState
 
           state.whenOrNull(
 
-            message: (message) {
+              forgotPasswordSuccess: (message, token) {
 
-              AppSnackBar.show(
-                context,
-                message: message,
-                type: AppSnackType.success,
-              );
+                AppSnackBar.show(
+                  context,
+                  message: message,
+                  type: AppSnackType.success,
+                );
 
-              Navigator.pushReplacementNamed(
-                context,
-                AppRoutes.otp,
-                arguments: {
-                  'email': emailCtrl.text.trim(),
-                },
-              );
-            },
+                Navigator.pushReplacementNamed(
+                  context,
+                  AppRoutes.otp,
+                  arguments: {
+                    'email': emailCtrl.text.trim(),
+                    'sentOtp': token,
+                  },
+                );
+              },
 
             error: (message) {
 

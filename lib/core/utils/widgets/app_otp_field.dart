@@ -62,8 +62,11 @@ class _AppOtpFieldState extends State<AppOtpField> {
       for (int i = 0; i < widget.length && i < digits.length; i++) {
         _controllers[i].text = digits[i];
       }
-      final nextIndex = (digits.length).clamp(0, widget.length - 1);
-      _focusNodes[nextIndex].requestFocus();
+      if (digits.length >= widget.length) {
+        _focusNodes.last.unfocus();
+      } else {
+        _focusNodes[digits.length].requestFocus();
+      }
     } else if (value.isNotEmpty) {
       // ── Normal input ────────────────────────────
       if (index < widget.length - 1) {
@@ -75,7 +78,7 @@ class _AppOtpFieldState extends State<AppOtpField> {
 
     final code = _currentCode;
     widget.onChanged?.call(code);
-    if (code.length == widget.length && !code.contains('')) {
+    if (code.length == widget.length) {
       widget.onCompleted?.call(code);
     }
   }
@@ -134,10 +137,22 @@ class _OtpBoxState extends State<_OtpBox> {
   @override
   void initState() {
     super.initState();
+
     widget.focusNode.addListener(() {
-      setState(() => _isFocused = widget.focusNode.hasFocus);
+      if (mounted) {
+        setState(() {
+          _isFocused = widget.focusNode.hasFocus;
+        });
+      }
+    });
+
+    widget.controller.addListener(() {
+      if (mounted) {
+        setState(() {});
+      }
     });
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -174,28 +189,29 @@ class _OtpBoxState extends State<_OtpBox> {
               ]
             : [],
       ),
-      child: KeyboardListener(
-        focusNode: FocusNode(),
-        onKeyEvent: widget.onKeyEvent,
-        child: TextField(
-          controller: widget.controller,
-          focusNode: widget.focusNode,
-          textAlign: TextAlign.center,
-          keyboardType: TextInputType.number,
-          maxLength: 1,
-          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          onChanged: widget.onChanged,
-          style: textTheme.displaySmall?.copyWith(
-            color: AppColors.primary[60],
-            fontWeight: FontWeight.w700,
-          ),
-          decoration: const InputDecoration(
-            counterText: '',
-            border: InputBorder.none,
-            enabledBorder: InputBorder.none,
-            focusedBorder: InputBorder.none,
-            contentPadding: EdgeInsets.zero,
-          ),
+      child: TextField(
+        controller: widget.controller,
+        focusNode: widget.focusNode,
+        textAlign: TextAlign.center,
+        textDirection: TextDirection.ltr,
+        keyboardType: TextInputType.number,
+        autofillHints: const [
+          AutofillHints.oneTimeCode,
+        ],
+        textInputAction: TextInputAction.next,
+        maxLength: 1,
+        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+        onChanged: widget.onChanged,
+        style: textTheme.displaySmall?.copyWith(
+          color: AppColors.primary[60],
+          fontWeight: FontWeight.w700,
+        ),
+        decoration: const InputDecoration(
+          counterText: '',
+          border: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          contentPadding: EdgeInsets.zero,
         ),
       ),
     );

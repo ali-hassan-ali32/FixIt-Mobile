@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import '../../../../core/l10n/translation/app_localizations.dart';
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_sizes.dart';
 import '../../../../core/utils/widgets/app_main_background.dart';
@@ -10,6 +13,10 @@ import '../../../../core/utils/widgets/app_page_header.dart';
 import '../../../../core/utils/widgets/app_rating_star.dart';
 import '../../../../core/utils/widgets/app_request_timeline.dart';
 import '../../../../core/utils/widgets/cards/app_star_rating_card.dart';
+import '../../data/models/requests/review_request.dart';
+import '../../domain/entities/customer_request_details_entity.dart';
+import '../cubit/customer_cubit.dart';
+import '../cubit/customer_state.dart';
 
 // ══════════════════════════════════════════════════════════════
 // CustomerTrackRequestCompletedView — layout router
@@ -36,15 +43,14 @@ abstract class _CompletedBase<T extends StatefulWidget> extends State<T>
   String get requestId;
   Color get accent => AppColors.primary[60]!;
 
-  final bool hasRated = false;
-  final double existingRating = 5.0;
+  CustomerRequestDetailsEntity? _details;
+  bool _hasRated = false;
 
   late final AnimationController entryCtrl;
   late final List<Animation<double>> entryFade;
   late final List<Animation<Offset>> entrySlide;
   static const _n = 5;
 
-  // Completion banner pop animation
   late final AnimationController bannerCtrl;
   late final Animation<double> bannerScale;
   late final Animation<double> bannerFade;
@@ -52,148 +58,86 @@ abstract class _CompletedBase<T extends StatefulWidget> extends State<T>
   @override
   void initState() {
     super.initState();
-    entryCtrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 750),
-    );
+    entryCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 750));
     entryFade = List.generate(_n, (i) {
       final s = (i * 0.15).clamp(0.0, 1.0);
       return Tween<double>(begin: 0.0, end: 1.0).animate(
-        CurvedAnimation(
-          parent: entryCtrl,
-          curve: Interval(s, (s + 0.45).clamp(0.0, 1.0), curve: Curves.easeOut),
-        ),
+        CurvedAnimation(parent: entryCtrl, curve: Interval(s, (s + 0.45).clamp(0.0, 1.0), curve: Curves.easeOut)),
       );
     });
     entrySlide = List.generate(_n, (i) {
       final s = (i * 0.15).clamp(0.0, 1.0);
-      return Tween<Offset>(
-        begin: const Offset(0, 0.14),
-        end: Offset.zero,
-      ).animate(
-        CurvedAnimation(
-          parent: entryCtrl,
-          curve: Interval(
-            s,
-            (s + 0.50).clamp(0.0, 1.0),
-            curve: Curves.easeOutCubic,
-          ),
-        ),
+      return Tween<Offset>(begin: const Offset(0, 0.14), end: Offset.zero).animate(
+        CurvedAnimation(parent: entryCtrl, curve: Interval(s, (s + 0.50).clamp(0.0, 1.0), curve: Curves.easeOutCubic)),
       );
     });
-
-    // Banner pops in with elastic bounce
-    bannerCtrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 700),
-    );
-    bannerScale = Tween<double>(
-      begin: 0.7,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: bannerCtrl, curve: Curves.easeOutBack));
+    bannerCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 700));
+    bannerScale = Tween<double>(begin: 0.7, end: 1.0).animate(CurvedAnimation(parent: bannerCtrl, curve: Curves.easeOutBack));
     bannerFade = CurvedAnimation(parent: bannerCtrl, curve: Curves.easeOut);
 
     entryCtrl.forward();
-    Future.delayed(const Duration(milliseconds: 200), () {
-      if (mounted) bannerCtrl.forward();
-    });
+    Future.delayed(const Duration(milliseconds: 200), () { if (mounted) bannerCtrl.forward(); });
   }
 
   @override
-  void dispose() {
-    entryCtrl.dispose();
-    bannerCtrl.dispose();
-    super.dispose();
-  }
+  void dispose() { entryCtrl.dispose(); bannerCtrl.dispose(); super.dispose(); }
 
   Widget ea(int i, Widget child) {
     final idx = i.clamp(0, _n - 1);
-    return FadeTransition(
-      opacity: entryFade[idx],
-      child: SlideTransition(position: entrySlide[idx], child: child),
-    );
+    return FadeTransition(opacity: entryFade[idx], child: SlideTransition(position: entrySlide[idx], child: child));
   }
 
-  void onRatingSubmit(int rating, AppLocalizations l10n) {
+  String _fmt(DateTime dt) => DateFormat('yyyy/MM/dd – HH:mm').format(dt);
+
+  void onRatingSubmit(BuildContext ctx, int rating, AppLocalizations l10n) {
+    ctx.read<CustomerCubit>().addReview(
+      requestId,
+      ReviewRequest(rating: rating, comment: ''),
+    );
+    setState(() => _hasRated = true);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
           children: [
             Icon(Icons.star_rounded, color: AppColors.star, size: 20.sp),
             SizedBox(width: 8.w),
-            Text(
-              '${l10n.ratingThanks} $rating ${l10n.ratingStars}',
-              style: GoogleFonts.cairo(fontWeight: FontWeight.w600),
-            ),
+            Text('${l10n.ratingThanks} $rating ${l10n.ratingStars}', style: GoogleFonts.cairo(fontWeight: FontWeight.w600)),
           ],
         ),
         backgroundColor: AppColors.accent[60],
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.r),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
       ),
     );
   }
 
   List<Widget> buildContent(
-    BuildContext context,
+    BuildContext ctx,
     bool isDark,
     AppLocalizations l10n,
+    CustomerRequestDetailsEntity d,
   ) {
-    final textTheme = Theme.of(context).textTheme;
-    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(ctx).textTheme;
+    final colorScheme = Theme.of(ctx).colorScheme;
 
     final steps = [
-      AppTimelineStep(
-        title: l10n.trackStepCreated,
-        time: '٢٠٢٦/٠٢/٠٨ - ١٠:٠٠ ص',
-        description: l10n.trackStepCreatedDesc,
-        status: TimelineStepStatus.completed,
-      ),
-      AppTimelineStep(
-        title: l10n.trackStepAccepted,
-        time: '٢٠٢٦/٠٢/٠٨ - ١١:٣٠ ص',
-        description: l10n.trackStepAcceptedDesc,
-        status: TimelineStepStatus.completed,
-      ),
-      AppTimelineStep(
-        title: l10n.trackStepInProgress,
-        time: '٢٠٢٦/٠٢/٠٩ - ٣:٠٠ م',
-        description: l10n.trackStepDoneDesc,
-        status: TimelineStepStatus.completed,
-      ),
-      AppTimelineStep(
-        title: l10n.trackStepCompleted,
-        time: '٢٠٢٦/٠٢/٠٩ - ٥:٠٠ م',
-        description: l10n.trackStepCompletedDesc,
-        status: TimelineStepStatus.completed,
-      ),
+      AppTimelineStep(title: l10n.trackStepCreated, time: _fmt(d.createdAt), description: l10n.trackStepCreatedDesc, status: TimelineStepStatus.completed),
+      AppTimelineStep(title: l10n.trackStepAccepted, time: _fmt(d.scheduledAt), description: l10n.trackStepAcceptedDesc, status: TimelineStepStatus.completed),
+      AppTimelineStep(title: l10n.trackStepInProgress, time: _fmt(d.scheduledAt), description: l10n.trackStepDoneDesc, status: TimelineStepStatus.completed),
+      AppTimelineStep(title: l10n.trackStepCompleted, time: _fmt(d.scheduledAt), description: l10n.trackStepCompletedDesc, status: TimelineStepStatus.completed),
     ];
 
     return [
-      // Completion banner — elastic pop
       FadeTransition(
         opacity: bannerFade,
         child: ScaleTransition(
           scale: bannerScale,
-          child: _CompletionBanner(
-            isDark: isDark,
-            textTheme: textTheme,
-            colorScheme: colorScheme,
-            l10n: l10n,
-          ),
+          child: _CompletionBanner(isDark: isDark, textTheme: textTheme, colorScheme: colorScheme, l10n: l10n),
         ),
       ),
       SizedBox(height: 24.h),
 
-      ea(
-        0,
-        Text(
-          l10n.trackStatusTitle,
-          style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
-        ),
-      ),
+      ea(0, Text(l10n.trackStatusTitle, style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800))),
       SizedBox(height: 16.h),
       ea(0, AppRequestTimeline(steps: steps, isDark: isDark)),
       SizedBox(height: 24.h),
@@ -204,15 +148,12 @@ abstract class _CompletedBase<T extends StatefulWidget> extends State<T>
           isDark: isDark,
           title: l10n.trackServiceDetailsTitle,
           rows: [
-            AppDetailRow(label: l10n.trackServiceType, value: 'كهرباء'),
-            AppDetailRow(label: l10n.trackLocation, value: 'القاهرة - المعادي'),
-            AppDetailRow(
-              label: l10n.trackCompletionDate,
-              value: '٢٠٢٦/٠٢/٠٩ - ٥:٠٠ م',
-            ),
+            AppDetailRow(label: l10n.trackServiceType, value: d.title),
+            AppDetailRow(label: l10n.trackLocation, value: d.address),
+            AppDetailRow(label: l10n.trackCompletionDate, value: _fmt(d.scheduledAt)),
             AppDetailRow(
               label: l10n.trackFinalPrice,
-              value: '100 ${l10n.searchCurrency}',
+              value: d.description,
               valueColor: AppColors.accent[60],
               showDivider: false,
             ),
@@ -221,27 +162,34 @@ abstract class _CompletedBase<T extends StatefulWidget> extends State<T>
       ),
       SizedBox(height: 16.h),
 
+      if (d.handymanName != null)
+        ea(2, _HandymanCard(isDark: isDark, textTheme: textTheme, colorScheme: colorScheme, l10n: l10n, name: d.handymanName!)),
+      SizedBox(height: 16.h),
+
       ea(
-        2,
-        _HandymanCard(
+        3,
+        _ReviewsNavCard(
           isDark: isDark,
           textTheme: textTheme,
-          colorScheme: colorScheme,
-          l10n: l10n,
+          accent: accent,
+          onTap: () => Navigator.of(context).pushNamed(
+            AppRoutes.customerViewHandymanReviews,
+            arguments: requestId,
+          ),
         ),
       ),
       SizedBox(height: 16.h),
 
       ea(
-        3,
+        4,
         AppStarRatingCard(
           isDark: isDark,
           prompt: l10n.ratingPrompt,
           submitLabel: l10n.ratingSubmitBtn,
-          hasRated: hasRated,
-          existingRating: existingRating,
+          hasRated: _hasRated,
+          existingRating: _hasRated ? 5.0 : null,
           alreadyRatedLabel: l10n.ratingAlreadyRated,
-          onSubmit: (r) => onRatingSubmit(r, l10n),
+          onSubmit: (r) => onRatingSubmit(ctx, r, l10n),
         ),
       ),
     ];
@@ -267,31 +215,47 @@ class _CompletedMobileBodyState extends _CompletedBase<_CompletedMobileBody> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context)!;
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: AppMainBackground(
-        child: Column(
-          children: [
-            AppPageHeader(
-              isDark: isDark,
-              accentColor: accent,
-              title: l10n.trackTitle,
-              subtitle: '#$requestId',
-            ),
-            Expanded(
-              child: ListView(
-                padding: EdgeInsets.fromLTRB(
-                  AppSpacing.xl.w,
-                  AppSpacing.xl.h,
-                  AppSpacing.xl.w,
-                  MediaQuery.of(context).padding.bottom + 32.h,
+
+    return BlocConsumer<CustomerCubit, CustomerState>(
+      listenWhen: (_, s) => s is CustomerRequestDetailsLoaded || s is CustomerMessage || s is CustomerError,
+      listener: (_, state) {
+        if (state is CustomerRequestDetailsLoaded) {
+          setState(() => _details = state.request);
+          entryCtrl.forward(from: 0);
+          Future.delayed(const Duration(milliseconds: 200), () { if (mounted) bannerCtrl.forward(from: 0); });
+        }
+        if (state is CustomerMessage) {
+          // review submitted — already handled by onRatingSubmit
+        }
+        if (state is CustomerError) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message)));
+        }
+      },
+      buildWhen: (_, s) => s is CustomerLoading || s is CustomerRequestDetailsLoaded || s is CustomerError,
+      builder: (ctx, state) {
+        return Scaffold(
+          backgroundColor: Colors.transparent,
+          body: AppMainBackground(
+            child: Column(
+              children: [
+                AppPageHeader(isDark: isDark, accentColor: accent, title: l10n.trackTitle, subtitle: '#$requestId'),
+                Expanded(
+                  child: state is CustomerLoading && _details == null
+                      ? const Center(child: CircularProgressIndicator())
+                      : state is CustomerError && _details == null
+                          ? Center(child: Text(state.message))
+                          : _details == null
+                              ? const Center(child: CircularProgressIndicator())
+                              : ListView(
+                                  padding: EdgeInsets.fromLTRB(AppSpacing.xl.w, AppSpacing.xl.h, AppSpacing.xl.w, MediaQuery.of(context).padding.bottom + 32.h),
+                                  children: buildContent(ctx, isDark, l10n, _details!),
+                                ),
                 ),
-                children: buildContent(context, isDark, l10n),
-              ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }
@@ -315,42 +279,55 @@ class _CompletedTabletBodyState extends _CompletedBase<_CompletedTabletBody> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context)!;
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: AppMainBackground(
-        child: Column(
-          children: [
-            AppPageHeader(
-              isDark: isDark,
-              accentColor: accent,
-              title: l10n.trackTitle,
-              subtitle: '#$requestId',
-            ),
-            Expanded(
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 600),
-                  child: ListView(
-                    padding: EdgeInsets.fromLTRB(
-                      AppSpacing.xl.w,
-                      AppSpacing.xl.h,
-                      AppSpacing.xl.w,
-                      32.h,
-                    ),
-                    children: buildContent(context, isDark, l10n),
-                  ),
+
+    return BlocConsumer<CustomerCubit, CustomerState>(
+      listenWhen: (_, s) => s is CustomerRequestDetailsLoaded || s is CustomerMessage || s is CustomerError,
+      listener: (_, state) {
+        if (state is CustomerRequestDetailsLoaded) {
+          setState(() => _details = state.request);
+          entryCtrl.forward(from: 0);
+          Future.delayed(const Duration(milliseconds: 200), () { if (mounted) bannerCtrl.forward(from: 0); });
+        }
+        if (state is CustomerError) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message)));
+        }
+      },
+      buildWhen: (_, s) => s is CustomerLoading || s is CustomerRequestDetailsLoaded || s is CustomerError,
+      builder: (ctx, state) {
+        return Scaffold(
+          backgroundColor: Colors.transparent,
+          body: AppMainBackground(
+            child: Column(
+              children: [
+                AppPageHeader(isDark: isDark, accentColor: accent, title: l10n.trackTitle, subtitle: '#$requestId'),
+                Expanded(
+                  child: state is CustomerLoading && _details == null
+                      ? const Center(child: CircularProgressIndicator())
+                      : state is CustomerError && _details == null
+                          ? Center(child: Text(state.message))
+                          : _details == null
+                              ? const Center(child: CircularProgressIndicator())
+                              : Center(
+                                  child: ConstrainedBox(
+                                    constraints: const BoxConstraints(maxWidth: 600),
+                                    child: ListView(
+                                      padding: EdgeInsets.fromLTRB(AppSpacing.xl.w, AppSpacing.xl.h, AppSpacing.xl.w, 32.h),
+                                      children: buildContent(ctx, isDark, l10n, _details!),
+                                    ),
+                                  ),
+                                ),
                 ),
-              ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }
 
 // ══════════════════════════════════════════════════════════════
-// _CompletionBanner — teal success card
+// _CompletionBanner
 // ══════════════════════════════════════════════════════════════
 class _CompletionBanner extends StatelessWidget {
   final bool isDark;
@@ -358,61 +335,32 @@ class _CompletionBanner extends StatelessWidget {
   final ColorScheme colorScheme;
   final AppLocalizations l10n;
 
-  const _CompletionBanner({
-    required this.isDark,
-    required this.textTheme,
-    required this.colorScheme,
-    required this.l10n,
-  });
+  const _CompletionBanner({required this.isDark, required this.textTheme, required this.colorScheme, required this.l10n});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppColors.accent[60]!.withOpacity(0.15),
-            AppColors.accent[60]!.withOpacity(0.05),
-          ],
-        ),
+        gradient: LinearGradient(colors: [AppColors.accent[60]!.withOpacity(0.15), AppColors.accent[60]!.withOpacity(0.05)]),
         borderRadius: BorderRadius.circular(20.r),
         border: Border.all(color: AppColors.accent[60]!.withOpacity(0.30)),
       ),
       child: Row(
         children: [
           Container(
-            width: 56.w,
-            height: 56.w,
-            decoration: BoxDecoration(
-              color: AppColors.accent[60]!.withOpacity(0.15),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              Icons.check_circle_rounded,
-              size: 32.sp,
-              color: AppColors.accent[60],
-            ),
+            width: 56.w, height: 56.w,
+            decoration: BoxDecoration(color: AppColors.accent[60]!.withOpacity(0.15), shape: BoxShape.circle),
+            child: Icon(Icons.check_circle_rounded, size: 32.sp, color: AppColors.accent[60]),
           ),
           SizedBox(width: 16.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  l10n.trackCompletedBannerTitle,
-                  style: textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
+                Text(l10n.trackCompletedBannerTitle, style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
                 SizedBox(height: 4.h),
-                Text(
-                  l10n.trackCompletedBannerSubtitle,
-                  style: textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                    height: 1.5,
-                  ),
-                ),
+                Text(l10n.trackCompletedBannerSubtitle, style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant, height: 1.5)),
               ],
             ),
           ),
@@ -423,20 +371,16 @@ class _CompletionBanner extends StatelessWidget {
 }
 
 // ══════════════════════════════════════════════════════════════
-// _HandymanCard — read-only, uses AppRatingStars
+// _HandymanCard
 // ══════════════════════════════════════════════════════════════
 class _HandymanCard extends StatelessWidget {
   final bool isDark;
   final TextTheme textTheme;
   final ColorScheme colorScheme;
   final AppLocalizations l10n;
+  final String name;
 
-  const _HandymanCard({
-    required this.isDark,
-    required this.textTheme,
-    required this.colorScheme,
-    required this.l10n,
-  });
+  const _HandymanCard({required this.isDark, required this.textTheme, required this.colorScheme, required this.l10n, required this.name});
 
   @override
   Widget build(BuildContext context) {
@@ -446,59 +390,29 @@ class _HandymanCard extends StatelessWidget {
         color: isDark ? AppColors.darkSurface : Colors.white,
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(color: AppColors.primary[60]!.withOpacity(0.08)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.15 : 0.05),
-            blurRadius: 12,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(isDark ? 0.15 : 0.05), blurRadius: 12, offset: const Offset(0, 2))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            l10n.trackHandymanTitle,
-            style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
-          ),
+          Text(l10n.trackHandymanTitle, style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
           SizedBox(height: 16.h),
           Row(
             children: [
               Container(
-                width: 64.w,
-                height: 64.w,
+                width: 64.w, height: 64.w,
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [AppColors.accent[60]!, AppColors.accent[70]!],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+                  gradient: LinearGradient(colors: [AppColors.accent[60]!, AppColors.accent[70]!], begin: Alignment.topLeft, end: Alignment.bottomRight),
                   borderRadius: BorderRadius.circular(14.r),
                 ),
-                child: Icon(
-                  Icons.person_rounded,
-                  size: 32.sp,
-                  color: Colors.white,
-                ),
+                child: Icon(Icons.person_rounded, size: 32.sp, color: Colors.white),
               ),
               SizedBox(width: 14.w),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'أحمد حسن',
-                      style: textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    SizedBox(height: 3.h),
-                    Text(
-                      'كهربائي خبير',
-                      style: textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
+                    Text(name, style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
                     SizedBox(height: 6.h),
                     AppRatingStars(rating: 5.0, starSize: 14),
                   ],
@@ -507,6 +421,71 @@ class _HandymanCard extends StatelessWidget {
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// _ReviewsNavCard — tappable card navigating to handyman reviews
+// ══════════════════════════════════════════════════════════════
+class _ReviewsNavCard extends StatelessWidget {
+  final bool isDark;
+  final TextTheme textTheme;
+  final Color accent;
+  final VoidCallback onTap;
+
+  const _ReviewsNavCard({
+    required this.isDark,
+    required this.textTheme,
+    required this.accent,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.darkSurface : Colors.white,
+          borderRadius: BorderRadius.circular(16.r),
+          border: Border.all(color: accent.withOpacity(0.18)),
+          boxShadow: [BoxShadow(color: Colors.black.withOpacity(isDark ? 0.15 : 0.05), blurRadius: 10, offset: const Offset(0, 2))],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 44.w, height: 44.w,
+              decoration: BoxDecoration(
+                color: accent.withOpacity(0.10),
+                borderRadius: BorderRadius.circular(12.r),
+              ),
+              child: Icon(Icons.star_rounded, size: 22.sp, color: accent),
+            ),
+            SizedBox(width: 14.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'مراجعات الفني',
+                    style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
+                  ),
+                  SizedBox(height: 2.h),
+                  Text(
+                    'اطلع على تقييمات العملاء الآخرين',
+                    style: textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right_rounded, size: 22.sp, color: accent),
+          ],
+        ),
       ),
     );
   }

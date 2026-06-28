@@ -7,7 +7,10 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/l10n/translation/app_localizations.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_sizes.dart';
+import '../../../../core/utils/functions/category_icon_mapper.dart';
+import '../../../../core/utils/functions/logout.dart';
 import '../../../../core/utils/functions/remeber_me.dart';
+import '../../../../core/utils/widgets/app_empty_states.dart';
 import '../../../../core/utils/widgets/app_main_background.dart';
 import '../../../../core/utils/widgets/animations/animated_confirm_dialog.dart';
 import '../../../../core/utils/widgets/app_category_chip.dart';
@@ -17,41 +20,42 @@ import '../../../../core/utils/widgets/app_profile_popup.dart';
 import '../../../../core/utils/widgets/app_search_bar.dart';
 import '../../../lookups/presentation/cubit/lookup_cubit.dart';
 import '../../../lookups/presentation/cubit/lookup_state.dart';
-import '../../data/models/requests/create_service_request.dart';
+import '../../../notifications/presentaions/cubit/notification_cubit.dart';
 import '../../domain/entities/customer_statistics_entity.dart';
+import '../../domain/entities/handyman_list_entity.dart';
 import '../cubit/customer_cubit.dart';
 import '../cubit/customer_state.dart';
 
-// ── Mock Data ─────────────────────────────────────────────────
-final _kHandymen = [
-  HandymanModel(
-    id: '1',
-    name: 'محمد علي',
-    specialty: 'فني سباكة محترف',
-    rating: 4.9,
-    reviewCount: 127,
-    hourlyRate: 150,
-    avatarGradient: [AppColors.primary[60]!, AppColors.secondary[60]!],
-  ),
-  HandymanModel(
-    id: '2',
-    name: 'أحمد حسن',
-    specialty: 'كهربائي خبير',
-    rating: 4.8,
-    reviewCount: 98,
-    hourlyRate: 120,
-    avatarGradient: [AppColors.accent[60]!, AppColors.accent[70]!],
-  ),
-  HandymanModel(
-    id: '3',
-    name: 'كريم سامي',
-    specialty: 'فني تكييفات',
-    rating: 4.7,
-    reviewCount: 84,
-    hourlyRate: 200,
-    avatarGradient: [AppColors.secondary[50]!, AppColors.primary[60]!],
-  ),
-];
+// // ── Mock Data ─────────────────────────────────────────────────
+// final _kHandymen = [
+//   HandymanModel(
+//     id: '1',
+//     name: 'محمد علي',
+//     specialty: 'فني سباكة محترف',
+//     rating: 4.9,
+//     reviewCount: 127,
+//     hourlyRate: 150,
+//     avatarGradient: [AppColors.primary[60]!, AppColors.secondary[60]!],
+//   ),
+//   HandymanModel(
+//     id: '2',
+//     name: 'أحمد حسن',
+//     specialty: 'كهربائي خبير',
+//     rating: 4.8,
+//     reviewCount: 98,
+//     hourlyRate: 120,
+//     avatarGradient: [AppColors.accent[60]!, AppColors.accent[70]!],
+//   ),
+//   HandymanModel(
+//     id: '3',
+//     name: 'كريم سامي',
+//     specialty: 'فني تكييفات',
+//     rating: 4.7,
+//     reviewCount: 84,
+//     hourlyRate: 200,
+//     avatarGradient: [AppColors.secondary[50]!, AppColors.primary[60]!],
+//   ),
+// ];
 
 // ══════════════════════════════════════════════════════════════
 // CustomerHomeView — layout router
@@ -90,6 +94,11 @@ abstract class _HomeBase<T extends StatefulWidget> extends State<T>
   @override
   void initState() {
     super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<CustomerCubit>()
+        ..getFeaturedHandymen();
+    });
 
     bellCtrl = AnimationController(
       vsync: this,
@@ -169,9 +178,11 @@ abstract class _HomeBase<T extends StatefulWidget> extends State<T>
       confirmLabel: l10n.profileMenuLogout,
       isDanger: true,
       onConfirm: () async {
-        await clearRememberMe();
+        await logout();
+
         if (!mounted) return;
-        Navigator.of(context).pushReplacementNamed(AppRoutes.login);
+
+        Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.login, (route) => false,);
       },
     );
   }
@@ -228,7 +239,7 @@ abstract class _HomeBase<T extends StatefulWidget> extends State<T>
                     BlocBuilder<CustomerCubit, CustomerState>(
                       builder: (context, state) {
 
-                        final name = cubit.profileData?.fullName ?? 'Customer';
+                        final name = cubit.customerProfileData?.fullName ?? 'غير معرف';
 
                         return Text(
                           '${l10n.homeGreeting} $name 👋',
@@ -253,7 +264,12 @@ abstract class _HomeBase<T extends StatefulWidget> extends State<T>
               // Notification button
               _IconBtn(
                 onTap: onNotificationTap,
-                badge: '٣',
+                badge: context
+                    .watch<NotificationCubit>()
+                    .notifications
+                    .where((e) => !e.isRead)
+                    .length
+                    .toString(),
                 isDark: isDark,
                 child: AnimatedBuilder(
                   animation: bellRotation,
@@ -273,12 +289,12 @@ abstract class _HomeBase<T extends StatefulWidget> extends State<T>
                 isDark: isDark,
                 onTap: () => AppProfilePopup.show(
                   context: context,
-                  name: cubit.profileData?.fullName ?? '',
-                  email: cubit.profileData?.email ?? '',
+                  name: cubit.customerProfileData?.fullName ?? '',
+                  email: cubit.customerProfileData?.email ?? '',
 
                   actions: AppProfilePopup.customerActions(
                     context,
-                    profile: l10n.profileMenuProfile,
+                    // profile: l10n.profileMenuProfile,
                     edit: l10n.profileMenuEdit,
                     settings: l10n.profileMenuSettings,
                     help: l10n.profileMenuHelp,
@@ -302,7 +318,10 @@ abstract class _HomeBase<T extends StatefulWidget> extends State<T>
               if (q.trim().isEmpty) return;
               Navigator.of(context).pushNamed(
                 AppRoutes.customerSearchResults,
-                arguments: {'query': q.trim()},
+                arguments: {
+                  'query': q.trim(),
+                  'search': true,
+                },
               );
             },
           ),
@@ -427,7 +446,9 @@ abstract class _HomeBase<T extends StatefulWidget> extends State<T>
 
                   return AppCategoryChip(
                     label: category.name,
-                    icon: Icons.home_repair_service,
+                    icon: CategoryIconMapper.iconOf(
+                      category.icon,
+                    ),
                     isActive:
                     activeCategoryIndex == i,
                     onTap: () {
@@ -491,32 +512,57 @@ abstract class _HomeBase<T extends StatefulWidget> extends State<T>
               ),
             ],
           ),
-          GestureDetector(
-            onTap: () {},
-            child: Text(
-              l10n.homeViewAll,
-              style: textTheme.bodyLarge?.copyWith(
-                color: AppColors.primary[60],
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
+          // GestureDetector(
+          //   onTap: () {
+          //     Navigator.of(context).pushNamed(
+          //       AppRoutes.customerSearchResults,
+          //     );
+          //   },
+          //   child: Text(
+          //     l10n.homeViewAll,
+          //     style: textTheme.bodyLarge?.copyWith(
+          //       color: AppColors.primary[60],
+          //       fontWeight: FontWeight.w700,
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );
   }
 
-  Widget buildHandymanCard(BuildContext context, AppLocalizations l10n, HandymanModel h,) {
+  Widget buildHandymanCard(
+      BuildContext context,
+      AppLocalizations l10n,
+      HandymanListEntity h,
+      ) {
     return AppHandymanCard(
-      handyman: h,
-      bookLabel: l10n.homeBookNow,
+      handyman: HandymanModel(
+        id: h.id,
+        name: h.fullName,
+        specialty: h.category,
+        rating: h.rating,
+        reviewCount: h.reviewCount,
+        hourlyRate: h.basePrice,
+        avatarGradient: [
+          AppColors.primary[60]!,
+          AppColors.secondary[60]!,
+        ],
+      ),      bookLabel: l10n.homeBookNow,
       hourlyRateLabel: l10n.homeHourlyRate,
       reviewsLabel: l10n.homeReviews,
-      onTap: () => Navigator.of(
-        context,
-      ).pushNamed(AppRoutes.customerViewHandyman, arguments: h.id),
-      onBook: () =>
-          Navigator.of(context).pushNamed(AppRoutes.customerBookService),
+      onTap: () async {
+        await context.read<CustomerCubit>()
+            .getHandymanDetails(h.id);
+
+        if (!context.mounted) return;
+
+        Navigator.of(context).pushNamed(
+          AppRoutes.customerViewHandyman,
+          arguments: h.id,
+        );
+      },
+      onBook: () => Navigator.of(context).pushNamed(AppRoutes.customerBookService),
     );}
 }
 
@@ -578,25 +624,63 @@ class _CustomerHomeMobileBodyState extends _HomeBase<CustomerHomeMobileBody> {
             slivers: [
               SliverToBoxAdapter(child: ea(0, buildHeader(context, l10n))),
               SliverToBoxAdapter(child: ea(1, buildBanner(context, l10n))),
-              SliverToBoxAdapter(child: ea(2, buildCategories(context, l10n))),
+              // SliverToBoxAdapter(child: ea(2, buildCategories(context, l10n))),
               SliverToBoxAdapter(child: ea(3, buildSectionHeader(context, l10n))),
               SliverPadding(
                 padding: EdgeInsets.symmetric(
                   horizontal: AppSpacing.xl.w,
                   vertical: 4.h,
                 ),
-                sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                        (_, i) => ea(
-                      4,
-                      Padding(
-                        padding: EdgeInsets.only(bottom: 16.h),
-                        child: buildHandymanCard(context, l10n, _kHandymen[i]),
+                sliver: BlocBuilder<CustomerCubit, CustomerState>(
+                  builder: (context, state) {
+                    final cubit = context.read<CustomerCubit>();
+
+                    if (state is CustomerLoading && cubit.featuredHandymen.isEmpty) {
+                      return const SliverToBoxAdapter(
+                        child: Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
+                    }
+
+                    if (state is CustomerError && cubit.featuredHandymen.isEmpty) {
+                      return SliverToBoxAdapter(
+                        child: AppEmptyState(
+                          icon: Icons.error_outline_rounded,
+                          title: 'Something went wrong',
+                          subtitle: state.message,
+                        ),
+                      );
+                    }
+
+                    if (cubit.featuredHandymen.isEmpty) {
+                      return SliverToBoxAdapter(
+                        child: AppEmptyState(
+                          icon: Icons.home_repair_service_outlined,
+                          title: 'No handymen found',
+                          subtitle: 'There are no featured handymen at the moment.',
+                        ),
+                      );
+                    }
+
+                    return SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                            (_, i) => ea(
+                          4,
+                          Padding(
+                            padding: EdgeInsets.only(bottom: 16.h),
+                            child: buildHandymanCard(
+                              context,
+                              l10n,
+                              cubit.featuredHandymen[i],
+                            ),
+                          ),
+                        ),
+                        childCount: cubit.featuredHandymen.length,
                       ),
-                    ),
-                    childCount: _kHandymen.length,
-                  ),
-                ),
+                    );
+                  },
+                )
               ),
               SliverToBoxAdapter(child: SizedBox(height: 100.h)),
             ],
@@ -651,18 +735,10 @@ class _CustomerHomeTabletBodyState extends _HomeBase<CustomerHomeTabletBody> {
                           ea(2, buildCategories(context, l10n)),
 
                           // Quick stats card
-                          ea(3, BlocBuilder<CustomerCubit, CustomerState>(
-                            builder: (context, state) {
-                              if (cubit.statisticsData == null) {
-                                return const CircularProgressIndicator();
-                              }
-
-                              return _StatsCard(
-                                statistics: cubit.statisticsData!,
-                                isDark: isDark,
-                                l10n: l10n,
-                              );
-                            },
+                          ea(3, _StatsCard(
+                            statistics: cubit.statisticsData,
+                            isDark: isDark,
+                            l10n: l10n,
                           ),),
                         ],
                       ),
@@ -696,11 +772,11 @@ class _CustomerHomeTabletBodyState extends _HomeBase<CustomerHomeTabletBody> {
                                   child: buildHandymanCard(
                                     context,
                                     l10n,
-                                    _kHandymen[i],
+                                    cubit.featuredHandymen[i],
                                   ),
                                 ),
                               ),
-                              childCount: _kHandymen.length,
+                              childCount: cubit.featuredHandymen.length,
                             ),
                           ),
                         ),
@@ -724,7 +800,7 @@ class _CustomerHomeTabletBodyState extends _HomeBase<CustomerHomeTabletBody> {
 class _StatsCard extends StatefulWidget {
   final bool isDark;
   final AppLocalizations l10n;
-  final CustomerStatisticsEntity statistics;
+  final CustomerStatisticsEntity? statistics;
   const _StatsCard({required this.isDark, required this.l10n, required this.statistics});
 
   @override
@@ -762,7 +838,6 @@ class _StatsCardState extends State<_StatsCard>
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
     return FadeTransition(
       opacity: _fade,
       child: SlideTransition(
@@ -800,27 +875,31 @@ class _StatsCardState extends State<_StatsCard>
                 ),
               ),
               SizedBox(height: 14.h),
-              Row(
-                children: [
-                  _StatItem(
-                    value: widget.statistics.totalRequests.toString(),
-                    label: 'طلبات',
-                    isDark: false,
-                  ),
-                  _Vdivider(),
-                  _StatItem(
-                    value: widget.statistics.completedRequests.toString(),
-                    label: 'مكتملة',
-                    isDark: false,
-                  ),
-                  _Vdivider(),
-                  _StatItem(
-                    value: widget.statistics.pendingRequests.toString(),
-                    label: 'معلقة',
-                    isDark: false,
-                  ),
-                ],
-              ),            ],
+              BlocBuilder<CustomerCubit, CustomerState>(
+                builder: (context, state) {
+                  return Row(
+                    children: [
+                      _StatItem(
+                        value: widget.statistics?.totalRequests.toString() ?? '-',
+                        label: 'طلبات',
+                        isDark: false,
+                      ),
+                      _Vdivider(),
+                      _StatItem(
+                        value: widget.statistics?.completedRequests.toString() ?? '-',
+                        label: 'مكتملة',
+                        isDark: false,
+                      ),
+                      _Vdivider(),
+                      _StatItem(
+                        value: widget.statistics?.pendingRequests.toString() ?? '-',
+                        label: 'معلقة',
+                        isDark: false,
+                      ),
+                    ],
+                  );},
+              ),
+            ],
           ),
         ),
       ),

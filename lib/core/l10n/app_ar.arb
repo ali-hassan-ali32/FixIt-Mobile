@@ -807,5 +807,7 @@
   "resetPasswordReqSpecial": "رمز خاص واحد على الأقل (!@#$%)",
   "resetPasswordRequirementsNotMet": "كلمة المرور لا تستوفي جميع المتطلبات",
   "resetPasswordSaveButton": "حفظ كلمة المرور",
-  "resetPasswordSuccessMessage": "تم تغيير كلمة المرور بنجاح"
+  "resetPasswordSuccessMessage": "تم تغيير كلمة المرور بنجاح",
+
+  "startJobBtn": "ابدء الوظيفه"
 }

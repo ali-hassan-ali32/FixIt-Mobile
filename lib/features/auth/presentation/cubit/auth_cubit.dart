@@ -135,9 +135,10 @@ class AuthCubit extends Cubit<AuthState> {
           failure.message,
         ),
       ),
-          (message) => emit(
-        AuthState.message(
-          message,
+          (response) => emit(
+        AuthState.forgotPasswordSuccess(
+          response.message ?? 'OTP sent successfully',
+          response.token,
         ),
       ),
     );

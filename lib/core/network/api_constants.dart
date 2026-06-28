@@ -59,8 +59,72 @@ class ApiConstants {
       'customers/statistics';
 
   // ==========================
-  // Customer Notifications
+  //  Notifications
   // ==========================
-  static const String readAllNotifications =
-      'customers/notifications/read-all';
+  static const getNotifications = '/notifications';
+
+  static const readNotification =
+      '/notifications/{id}/read';
+
+  static const readAllNotifications =
+      '/notifications/read-all';
+
+  static const deleteNotification =
+      '/notifications/{id}';
+
+
+
+
+  // Handyman Profile
+  static const String handymanProfile = 'handymen/me';
+
+  // Handyman Jobs
+  static const String handymanJobs = 'handymen/me/jobs';
+
+  static const String handymanJobDetails = 'handymen/jobs/{id}';
+
+  static const String handymanUpdateJobStatus = 'handymen/jobs/{id}/status';
+
+  // Handyman Reviews
+  static const String handymanReviews = 'handymen/me/reviews';
+
+  // Available Requests
+  static const String handymanAvailableRequests = 'handymen/me/pending-jobs';
+
+
+  static const String handymanStatistics =
+      'handymen/me/statistics';
+
+  static const String handymanPortfolio =
+      'handymen/me/portfolio';
+
+  static const String handymanDeletePortfolio =
+      'handymen/me/portfolio/{id}';
+
+
+
+
+
+
+
+  static const customerHandymen = '/customers/handymen';
+
+  static const customerFeaturedHandymen =
+      '/customers/featured-handymen';
+
+  static const customerHandymanDetails =
+      '/customers/handymen/{handymanId}';
+
+  static const customerHandymanPortfolio =
+      '/customers/handymen/{handymanId}/portfolio';
+
+
+  static const customerHandymanReviews =
+      '/customers/handymen/{handymanId}/reviews';
+
+  static const customerAddReview =
+      '/customers/requests/{requestId}/review';
+
+  static const customerReviews =
+      '/customers/reviews';
 }

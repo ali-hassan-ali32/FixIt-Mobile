@@ -895,18 +895,18 @@ class _RequestCardState extends State<_RequestCard> with TickerProviderStateMixi
                       children: [
                         // ID + status badge
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            Text(
-                              '#${r.id}',
-                              style: Theme.of(context).textTheme.bodySmall
-                                  ?.copyWith(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurfaceVariant,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                            ),
+                            // Text(
+                            //   '#${r.id}',
+                            //   style: Theme.of(context).textTheme.bodySmall
+                            //       ?.copyWith(
+                            //         color: Theme.of(
+                            //           context,
+                            //         ).colorScheme.onSurfaceVariant,
+                            //         fontWeight: FontWeight.w600,
+                            //       ),
+                            // ),
                             _StatusBadge(cfg: cfg),
                           ],
                         ),
