@@ -1385,6 +1385,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ratingStars => 'stars';
 
   @override
+  String get ratingCommentLabel => 'Your comment (optional)';
+
+  @override
+  String get ratingCommentHint => 'Share your experience with the handyman...';
+
+  @override
   String get trackStepCancelled => 'Request Cancelled';
 
   @override

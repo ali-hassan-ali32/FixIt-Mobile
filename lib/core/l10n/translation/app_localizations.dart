@@ -2750,6 +2750,18 @@ abstract class AppLocalizations {
   /// **'stars'**
   String get ratingStars;
 
+  /// No description provided for @ratingCommentLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Your comment (optional)'**
+  String get ratingCommentLabel;
+
+  /// No description provided for @ratingCommentHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Share your experience with the handyman...'**
+  String get ratingCommentHint;
+
   /// No description provided for @trackStepCancelled.
   ///
   /// In en, this message translates to:

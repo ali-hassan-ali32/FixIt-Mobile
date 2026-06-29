@@ -50,73 +50,80 @@ class AppEmptyState extends StatelessWidget {
     final resolvedColor = color ?? AppColors.primary[60]!;
 
     return Center(
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 60.h),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Icon bubble
-            Container(
-              width: 88.w,
-              height: 88.h,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    resolvedColor.withOpacity(0.10),
-                    resolvedColor.withOpacity(0.06),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+        child: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 24.h),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: MediaQuery.of(context).size.height * .4,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+              // Icon bubble
+              Container(
+                width: 88.w,
+                height: 88.h,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      resolvedColor.withOpacity(0.10),
+                      resolvedColor.withOpacity(0.06),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  shape: BoxShape.circle,
                 ),
-                shape: BoxShape.circle,
+                child: Icon(
+                  icon,
+                  size: 38.sp,
+                  color: resolvedColor,
+                ),
               ),
-              child: Icon(
-                icon,
-                size: 38.sp,
-                color: resolvedColor,
+
+              SizedBox(height: 20.h),
+
+              Text(
+                title,
+                style: textTheme.titleMedium
+                    ?.copyWith(fontWeight: FontWeight.w800),
+                textAlign: TextAlign.center,
               ),
-            ),
-            SizedBox(height: 20.h),
+              SizedBox(height: 8.h),
 
-            Text(
-              title,
-              style: textTheme.titleMedium
-                  ?.copyWith(fontWeight: FontWeight.w800),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 8.h),
+              Text(
+                subtitle,
+                style: textTheme.bodyMedium
+                    ?.copyWith(color: colorScheme.onSurfaceVariant),
+                textAlign: TextAlign.center,
+              ),
 
-            Text(
-              subtitle,
-              style: textTheme.bodyMedium
-                  ?.copyWith(color: colorScheme.onSurfaceVariant),
-              textAlign: TextAlign.center,
-            ),
-
-            if (actionLabel != null && onAction != null) ...[
-              SizedBox(height: 24.h),
-              TextButton(
-                onPressed: onAction,
-                style: TextButton.styleFrom(
-                  foregroundColor: resolvedColor,
-                  padding: EdgeInsets.symmetric(
-                      horizontal: 24.w, vertical: 12.h),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.r),
-                    side: BorderSide(
-                        color: resolvedColor.withOpacity(0.4)),
+              if (actionLabel != null && onAction != null) ...[
+                SizedBox(height: 24.h),
+                TextButton(
+                  onPressed: onAction,
+                  style: TextButton.styleFrom(
+                    foregroundColor: resolvedColor,
+                    padding: EdgeInsets.symmetric(
+                        horizontal: 24.w, vertical: 12.h),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.r),
+                      side: BorderSide(
+                          color: resolvedColor.withOpacity(0.4)),
+                    ),
+                  ),
+                  child: Text(
+                    actionLabel!,
+                    style: GoogleFonts.cairo(
+                        fontSize: 14.sp, fontWeight: FontWeight.w700),
                   ),
                 ),
-                child: Text(
-                  actionLabel!,
-                  style: GoogleFonts.cairo(
-                      fontSize: 14.sp, fontWeight: FontWeight.w700),
-                ),
-              ),
-            ],
-          ],
+              ],
+              ],
+            ),
+          ),
         ),
-      ),
     );
   }
 }

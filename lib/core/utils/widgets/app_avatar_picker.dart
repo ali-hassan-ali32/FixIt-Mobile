@@ -99,7 +99,7 @@ class _AppAvatarPickerState extends State<AppAvatarPicker>
       mainAxisSize: MainAxisSize.min,
       children: [
         GestureDetector(
-          onTap: _pick,
+          // onTap: _pick,
           child: ScaleTransition(
             scale: _pulseAnim,
             child: Stack(
@@ -142,31 +142,31 @@ class _AppAvatarPickerState extends State<AppAvatarPicker>
                 ),
 
                 // ── Edit button ───────────────────────────
-                Positioned(
-                  bottom: 0,
-                  right: 0,
-                  child: Container(
-                    width: 32.w,
-                    height: 32.h,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: _accent, width: 2),
-                      boxShadow: [
-                        BoxShadow(
-                          color: _accent.withOpacity(0.2),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Icon(
-                      Icons.edit_rounded,
-                      size: 15.sp,
-                      color: _accent,
-                    ),
-                  ),
-                ),
+                // Positioned(
+                //   bottom: 0,
+                //   right: 0,
+                //   child: Container(
+                //     width: 32.w,
+                //     height: 32.h,
+                //     decoration: BoxDecoration(
+                //       color: Colors.white,
+                //       shape: BoxShape.circle,
+                //       border: Border.all(color: _accent, width: 2),
+                //       boxShadow: [
+                //         BoxShadow(
+                //           color: _accent.withOpacity(0.2),
+                //           blurRadius: 8,
+                //           offset: const Offset(0, 2),
+                //         ),
+                //       ],
+                //     ),
+                //     child: Icon(
+                //       Icons.edit_rounded,
+                //       size: 15.sp,
+                //       color: _accent,
+                //     ),
+                //   ),
+                // ),
               ],
             ),
           ),

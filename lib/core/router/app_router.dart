@@ -318,7 +318,10 @@ class AppRouter {
       case AppRoutes.handymanHome:
         return _buildRoute(
           settings: settings,
-          child: const HandymanShell(),
+          child: BlocProvider(
+            create: (_) => getIt<NotificationCubit>()..getNotifications(),
+            child: const HandymanShell(),
+          ),
           transition: _TransitionType.fade,
         );
 

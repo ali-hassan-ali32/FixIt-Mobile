@@ -356,9 +356,18 @@ class _EditProfileMobileBodyState
             rateCtrl.text  = profile.basePrice.toStringAsFixed(0);
             setState(() {
               isAvailable = profile.isAvailable;
-              specialty = profile.category
-                  .toLowerCase()
-                  .replaceAll(' ', '');
+
+              const allowedSpecialties = {
+                'plumbing',
+                'electric',
+                'carpentry',
+                'painting',
+                'ac',
+              };
+
+              final value = profile.category.toLowerCase().trim();
+
+              specialty = allowedSpecialties.contains(value) ? value : null;
             });
           },
           message: (message) {
@@ -471,7 +480,18 @@ class _EditProfileTabletBodyState
             rateCtrl.text  = profile.basePrice.toStringAsFixed(0);
             setState(() {
               isAvailable = profile.isAvailable;
-              specialty   = profile.category;
+
+              const allowedSpecialties = {
+                'plumbing',
+                'electric',
+                'carpentry',
+                'painting',
+                'ac',
+              };
+
+              final value = profile.category.toLowerCase().trim();
+
+              specialty = allowedSpecialties.contains(value) ? value : null;
             });
           },
           message: (message) {

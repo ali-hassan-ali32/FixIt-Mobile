@@ -126,33 +126,6 @@ abstract class _SettingsBase<T extends StatefulWidget> extends State<T>
       children: [
 
         // ── Preferences ──────────────────────────────────
-        ea(
-          1,
-          AppSettingsSection(
-            title: l10n.settingsSectionApp,
-            isDark: isDark,
-            children: [
-              // Notifications toggle
-              AppSettingsItem(
-                icon: Icons.notifications_outlined,
-                iconBgColor: const Color(0xFFFFF7ED),
-                iconColor: const Color(0xFFEA580C),
-                label: l10n.settingsNotifications,
-                isDark: isDark,
-                showChevron: false,
-                trailing: _AnimatedSwitch(
-                  value: notificationsEnabled,
-                  activeColor: accent,
-                  onChanged: (v) {
-                    HapticFeedback.selectionClick();
-                    setState(() => notificationsEnabled = v);
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
-        SizedBox(height: 4.h),
 
         ea(
           2,
@@ -246,34 +219,34 @@ abstract class _SettingsBase<T extends StatefulWidget> extends State<T>
         SizedBox(height: 4.h),
 
         // ── Legal ─────────────────────────────────────────
-        ea(
-          4,
-          AppSettingsSection(
-            title: l10n.settingsSectionLegal,
-            isDark: isDark,
-            children: [
-              AppSettingsItem(
-                icon: Icons.shield_outlined,
-                iconBgColor: const Color(0xFFFAF5FF),
-                iconColor: const Color(0xFF9333EA),
-                label: l10n.settingsPrivacyPolicy,
-                isDark: isDark,
-                onTap: () =>
-                    AppSnackBar.show(context, message: l10n.comingSoon),
-              ),
-              AppSettingsItem(
-                icon: Icons.article_outlined,
-                iconBgColor: const Color(0xFFFFF1F2),
-                iconColor: const Color(0xFFE11D48),
-                label: l10n.settingsTerms,
-                isDark: isDark,
-                onTap: () =>
-                    AppSnackBar.show(context, message: l10n.comingSoon),
-              ),
-            ],
-          ),
-        ),
-        SizedBox(height: 20.h),
+        // ea(
+        //   4,
+        //   AppSettingsSection(
+        //     title: l10n.settingsSectionLegal,
+        //     isDark: isDark,
+        //     children: [
+        //       AppSettingsItem(
+        //         icon: Icons.shield_outlined,
+        //         iconBgColor: const Color(0xFFFAF5FF),
+        //         iconColor: const Color(0xFF9333EA),
+        //         label: l10n.settingsPrivacyPolicy,
+        //         isDark: isDark,
+        //         onTap: () =>
+        //             AppSnackBar.show(context, message: l10n.comingSoon),
+        //       ),
+        //       // AppSettingsItem(
+        //       //   icon: Icons.article_outlined,
+        //       //   iconBgColor: const Color(0xFFFFF1F2),
+        //       //   iconColor: const Color(0xFFE11D48),
+        //       //   label: l10n.settingsTerms,
+        //       //   isDark: isDark,
+        //       //   onTap: () =>
+        //       //       AppSnackBar.show(context, message: l10n.comingSoon),
+        //       // ),
+        //     ],
+        //   ),
+        // ),
+        // SizedBox(height: 20.h),
 
         // ── Danger ────────────────────────────────────────
         // ea(
@@ -501,8 +474,7 @@ class _LangToggleState extends State<_LangToggle>
       onTapCancel: () => _ctrl.reverse(),
       child: ScaleTransition(
         scale: _scale,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 250),
+        child: Container(
           padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 4.h),
           decoration: BoxDecoration(
             color: isDark
@@ -518,31 +490,37 @@ class _LangToggleState extends State<_LangToggle>
             mainAxisSize: MainAxisSize.min,
             children: ['AR', 'EN'].map((lang) {
               final isActive = (lang == 'AR') == widget.isAr;
-              return AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                curve: Curves.easeOutBack,
-                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-                decoration: BoxDecoration(
-                  color: isActive ? widget.accent : Colors.transparent,
-                  borderRadius: BorderRadius.circular(16.r),
-                  boxShadow: isActive
-                      ? [
-                          BoxShadow(
-                            color: widget.accent.withOpacity(0.30),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ]
-                      : [],
-                ),
-                child: Text(
-                  lang,
-                  style: GoogleFonts.cairo(
-                    fontSize: 12.sp,
-                    fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
-                    color: isActive
-                        ? Colors.white
-                        : Theme.of(context).colorScheme.onSurfaceVariant,
+
+              return GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: widget.onToggle,
+                child: Container(
+                  margin: EdgeInsets.symmetric(horizontal: 2.w),
+                  padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                  decoration: BoxDecoration(
+                    color: isActive ? widget.accent : Colors.transparent,
+                    borderRadius: BorderRadius.circular(16.r),
+                    boxShadow: isActive
+                        ? [
+                      BoxShadow(
+                        color: widget.accent.withOpacity(.30),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ]
+                        : null,
+                  ),
+                  child: Text(
+                    lang,
+                    style: GoogleFonts.cairo(
+                      fontSize: 12.sp,
+                      fontWeight: isActive
+                          ? FontWeight.w700
+                          : FontWeight.w500,
+                      color: isActive
+                          ? Colors.white
+                          : Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 ),
               );

@@ -30,7 +30,7 @@ Future<void> main() async {
     ChangeNotifierProvider<AppConfigProvider>.value(
       value: config,
       child: DevicePreview(
-        enabled: !kReleaseMode,
+        enabled: false,
           builder: (context) => FixItApp(
           ),
       ),

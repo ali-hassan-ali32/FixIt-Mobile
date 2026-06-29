@@ -2,8 +2,9 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'create_service_request.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(includeIfNull: false)
 class CreateServiceRequest {
+  @JsonKey(includeIfNull: false)
   final String? handymanId;
   final String categoryId;
   final String cityId;

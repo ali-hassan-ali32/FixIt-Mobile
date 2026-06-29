@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -12,7 +13,6 @@ import '../../../../core/utils/widgets/app_detail_row.dart';
 import '../../../../core/utils/widgets/app_page_header.dart';
 import '../../../../core/utils/widgets/app_rating_star.dart';
 import '../../../../core/utils/widgets/app_request_timeline.dart';
-import '../../../../core/utils/widgets/cards/app_star_rating_card.dart';
 import '../../data/models/requests/review_request.dart';
 import '../../domain/entities/customer_request_details_entity.dart';
 import '../cubit/customer_cubit.dart';
@@ -89,28 +89,6 @@ abstract class _CompletedBase<T extends StatefulWidget> extends State<T>
 
   String _fmt(DateTime dt) => DateFormat('yyyy/MM/dd – HH:mm').format(dt);
 
-  void onRatingSubmit(BuildContext ctx, int rating, AppLocalizations l10n) {
-    ctx.read<CustomerCubit>().addReview(
-      requestId,
-      ReviewRequest(rating: rating, comment: ''),
-    );
-    setState(() => _hasRated = true);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            Icon(Icons.star_rounded, color: AppColors.star, size: 20.sp),
-            SizedBox(width: 8.w),
-            Text('${l10n.ratingThanks} $rating ${l10n.ratingStars}', style: GoogleFonts.cairo(fontWeight: FontWeight.w600)),
-          ],
-        ),
-        backgroundColor: AppColors.accent[60],
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-      ),
-    );
-  }
-
   List<Widget> buildContent(
     BuildContext ctx,
     bool isDark,
@@ -166,30 +144,51 @@ abstract class _CompletedBase<T extends StatefulWidget> extends State<T>
         ea(2, _HandymanCard(isDark: isDark, textTheme: textTheme, colorScheme: colorScheme, l10n: l10n, name: d.handymanName!)),
       SizedBox(height: 16.h),
 
-      ea(
-        3,
-        _ReviewsNavCard(
-          isDark: isDark,
-          textTheme: textTheme,
-          accent: accent,
-          onTap: () => Navigator.of(context).pushNamed(
-            AppRoutes.customerViewHandymanReviews,
-            arguments: requestId,
-          ),
-        ),
-      ),
-      SizedBox(height: 16.h),
+      // Reviews nav card — uses handymanId if available, falls back to requestId
+      // ea(
+      //   3,
+      //   _ReviewsNavCard(
+      //     isDark: isDark,
+      //     textTheme: textTheme,
+      //     accent: accent,
+      //     onTap: () => Navigator.of(context).pushNamed(
+      //       AppRoutes.customerViewHandymanReviews,
+      //       arguments: d.handymanId ?? requestId,
+      //     ),
+      //   ),
+      // ),
+      // SizedBox(height: 16.h),
 
+      // Rating + comment card
       ea(
         4,
-        AppStarRatingCard(
+        _RatingCommentCard(
           isDark: isDark,
-          prompt: l10n.ratingPrompt,
-          submitLabel: l10n.ratingSubmitBtn,
+          textTheme: textTheme,
+          colorScheme: colorScheme,
+          l10n: l10n,
           hasRated: _hasRated,
-          existingRating: _hasRated ? 5.0 : null,
-          alreadyRatedLabel: l10n.ratingAlreadyRated,
-          onSubmit: (r) => onRatingSubmit(ctx, r, l10n),
+          onSubmit: (rating, comment) {
+            ctx.read<CustomerCubit>().addReview(
+              requestId,
+              ReviewRequest(rating: rating, comment: comment),
+            );
+            setState(() => _hasRated = true);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Row(
+                  children: [
+                    Icon(Icons.star_rounded, color: AppColors.star, size: 20.sp),
+                    SizedBox(width: 8.w),
+                    Text('${l10n.ratingThanks} $rating ${l10n.ratingStars}', style: GoogleFonts.cairo(fontWeight: FontWeight.w600)),
+                  ],
+                ),
+                backgroundColor: AppColors.accent[60],
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+              ),
+            );
+          },
         ),
       ),
     ];
@@ -224,9 +223,6 @@ class _CompletedMobileBodyState extends _CompletedBase<_CompletedMobileBody> {
           entryCtrl.forward(from: 0);
           Future.delayed(const Duration(milliseconds: 200), () { if (mounted) bannerCtrl.forward(from: 0); });
         }
-        if (state is CustomerMessage) {
-          // review submitted — already handled by onRatingSubmit
-        }
         if (state is CustomerError) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message)));
         }
@@ -243,7 +239,7 @@ class _CompletedMobileBodyState extends _CompletedBase<_CompletedMobileBody> {
                   child: state is CustomerLoading && _details == null
                       ? const Center(child: CircularProgressIndicator())
                       : state is CustomerError && _details == null
-                          ? Center(child: Text(state.message))
+                          ? Center(child: Text((state as CustomerError).message))
                           : _details == null
                               ? const Center(child: CircularProgressIndicator())
                               : ListView(
@@ -304,7 +300,7 @@ class _CompletedTabletBodyState extends _CompletedBase<_CompletedTabletBody> {
                   child: state is CustomerLoading && _details == null
                       ? const Center(child: CircularProgressIndicator())
                       : state is CustomerError && _details == null
-                          ? Center(child: Text(state.message))
+                          ? Center(child: Text((state as CustomerError).message))
                           : _details == null
                               ? const Center(child: CircularProgressIndicator())
                               : Center(
@@ -435,12 +431,7 @@ class _ReviewsNavCard extends StatelessWidget {
   final Color accent;
   final VoidCallback onTap;
 
-  const _ReviewsNavCard({
-    required this.isDark,
-    required this.textTheme,
-    required this.accent,
-    required this.onTap,
-  });
+  const _ReviewsNavCard({required this.isDark, required this.textTheme, required this.accent, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -458,10 +449,7 @@ class _ReviewsNavCard extends StatelessWidget {
           children: [
             Container(
               width: 44.w, height: 44.w,
-              decoration: BoxDecoration(
-                color: accent.withOpacity(0.10),
-                borderRadius: BorderRadius.circular(12.r),
-              ),
+              decoration: BoxDecoration(color: accent.withOpacity(0.10), borderRadius: BorderRadius.circular(12.r)),
               child: Icon(Icons.star_rounded, size: 22.sp, color: accent),
             ),
             SizedBox(width: 14.w),
@@ -469,22 +457,282 @@ class _ReviewsNavCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'مراجعات الفني',
-                    style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
-                  ),
+                  Text('مراجعات الفني', style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700)),
                   SizedBox(height: 2.h),
-                  Text(
-                    'اطلع على تقييمات العملاء الآخرين',
-                    style: textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-                  ),
+                  Text('اطلع على تقييمات العملاء الآخرين', style: textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
                 ],
               ),
             ),
             Icon(Icons.chevron_right_rounded, size: 22.sp, color: accent),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// _RatingCommentCard — stars + comment text field + submit
+// ══════════════════════════════════════════════════════════════
+class _RatingCommentCard extends StatefulWidget {
+  final bool isDark;
+  final TextTheme textTheme;
+  final ColorScheme colorScheme;
+  final AppLocalizations l10n;
+  final bool hasRated;
+  final void Function(int rating, String comment) onSubmit;
+
+  const _RatingCommentCard({
+    required this.isDark,
+    required this.textTheme,
+    required this.colorScheme,
+    required this.l10n,
+    required this.hasRated,
+    required this.onSubmit,
+  });
+
+  @override
+  State<_RatingCommentCard> createState() => _RatingCommentCardState();
+}
+
+class _RatingCommentCardState extends State<_RatingCommentCard> {
+  int _selected = 0;
+  int _hovered = 0;
+  bool _submitted = false;
+  final TextEditingController _commentCtrl = TextEditingController();
+  final FocusNode _commentFocus = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    _submitted = widget.hasRated;
+    if (widget.hasRated) _selected = 5;
+  }
+
+  @override
+  void dispose() {
+    _commentCtrl.dispose();
+    _commentFocus.dispose();
+    super.dispose();
+  }
+
+  String _emoji(int s) {
+    switch (s) {
+      case 1: return '😞';
+      case 2: return '😕';
+      case 3: return '😐';
+      case 4: return '😊';
+      case 5: return '🤩';
+      default: return '⭐';
+    }
+  }
+
+  void _submit() {
+    if (_selected == 0) return;
+    HapticFeedback.mediumImpact();
+    _commentFocus.unfocus();
+    setState(() => _submitted = true);
+    widget.onSubmit(_selected, _commentCtrl.text.trim());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = widget.l10n;
+    final textTheme = widget.textTheme;
+    final colorScheme = widget.colorScheme;
+    final isDark = widget.isDark;
+    final display = _hovered > 0 ? _hovered : _selected;
+
+    return Container(
+      padding: EdgeInsets.all(20.w),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.darkSurface : Colors.white,
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(
+          color: _submitted
+              ? AppColors.accent[60]!.withOpacity(0.30)
+              : AppColors.primary[60]!.withOpacity(0.08),
+        ),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(isDark ? 0.15 : 0.05), blurRadius: 12, offset: const Offset(0, 2))],
+      ),
+      child: _submitted ? _buildSubmitted(textTheme) : _buildForm(textTheme, colorScheme, display, l10n, isDark),
+    );
+  }
+
+  // ── Already submitted ────────────────────────────────────
+  Widget _buildSubmitted(TextTheme textTheme) {
+    return Column(
+      children: [
+        Container(
+          width: 64.w, height: 64.w,
+          decoration: BoxDecoration(color: AppColors.accent[60]!.withOpacity(0.10), shape: BoxShape.circle),
+          child: Icon(Icons.check_circle_rounded, size: 36.sp, color: AppColors.accent[60]),
+        ),
+        SizedBox(height: 12.h),
+        Text(
+          '${_emoji(_selected)} ${widget.l10n.ratingAlreadyRated}',
+          style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+          textAlign: TextAlign.center,
+        ),
+        SizedBox(height: 10.h),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(5, (i) => Icon(
+            i < _selected ? Icons.star_rounded : Icons.star_outline_rounded,
+            size: 28.sp,
+            color: i < _selected ? AppColors.star : Colors.grey.withOpacity(0.3),
+          )),
+        ),
+        if (_commentCtrl.text.trim().isNotEmpty) ...[
+          SizedBox(height: 12.h),
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.all(12.w),
+            decoration: BoxDecoration(
+              color: AppColors.accent[60]!.withOpacity(0.06),
+              borderRadius: BorderRadius.circular(10.r),
+            ),
+            child: Text(
+              _commentCtrl.text.trim(),
+              style: textTheme.bodySmall?.copyWith(height: 1.5, color: widget.colorScheme.onSurfaceVariant),
+              textAlign: TextAlign.start,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  // ── Interactive form ─────────────────────────────────────
+  Widget _buildForm(TextTheme textTheme, ColorScheme colorScheme, int display, AppLocalizations l10n, bool isDark) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Prompt
+        Text(l10n.ratingPrompt, style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700), textAlign: TextAlign.center),
+        SizedBox(height: 16.h),
+
+        // Emoji
+        Center(
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 200),
+            child: Text(_emoji(display), key: ValueKey(display), style: TextStyle(fontSize: 32.sp)),
+          ),
+        ),
+        SizedBox(height: 12.h),
+
+        // Stars
+        Center(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: List.generate(5, (i) {
+              final v = i + 1;
+              final isOn = v <= display;
+              return GestureDetector(
+                onTapDown: (_) { setState(() => _hovered = v); HapticFeedback.selectionClick(); },
+                onTapUp: (_) { setState(() { _selected = v; _hovered = 0; }); },
+                onTapCancel: () => setState(() => _hovered = 0),
+                child: AnimatedScale(
+                  scale: isOn ? 1.15 : 1.0,
+                  duration: const Duration(milliseconds: 150),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 4.w),
+                    child: Icon(
+                      isOn ? Icons.star_rounded : Icons.star_outline_rounded,
+                      size: 36.sp,
+                      color: isOn ? AppColors.star : Colors.grey.withOpacity(0.3),
+                    ),
+                  ),
+                ),
+              );
+            }),
+          ),
+        ),
+        SizedBox(height: 20.h),
+
+        // Comment text field
+        Text(l10n.ratingCommentLabel, style: textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w700, color: colorScheme.onSurfaceVariant)),
+        SizedBox(height: 8.h),
+        TextField(
+          controller: _commentCtrl,
+          focusNode: _commentFocus,
+          maxLines: 3,
+          minLines: 2,
+          maxLength: 300,
+          style: GoogleFonts.cairo(fontSize: 14.sp),
+          decoration: InputDecoration(
+            hintText: l10n.ratingCommentHint,
+            hintStyle: GoogleFonts.cairo(fontSize: 13.sp, color: colorScheme.onSurfaceVariant.withOpacity(0.60)),
+            filled: true,
+            fillColor: isDark ? AppColors.darkBgSecondary : AppColors.primary[60]!.withOpacity(0.04),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.r),
+              borderSide: BorderSide(color: AppColors.primary[60]!.withOpacity(0.15)),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.r),
+              borderSide: BorderSide(color: AppColors.primary[60]!.withOpacity(0.15)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.r),
+              borderSide: BorderSide(color: AppColors.primary[60]!, width: 1.5),
+            ),
+            counterStyle: GoogleFonts.cairo(fontSize: 11.sp, color: colorScheme.onSurfaceVariant.withOpacity(0.50)),
+            contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
+          ),
+        ),
+        SizedBox(height: 16.h),
+
+        // Submit button
+        _SubmitButton(
+          label: l10n.ratingSubmitBtn,
+          enabled: _selected > 0,
+          onTap: _submit,
+        ),
+      ],
+    );
+  }
+}
+
+// ── Submit button ──────────────────────────────────────────
+class _SubmitButton extends StatefulWidget {
+  final String label;
+  final bool enabled;
+  final VoidCallback onTap;
+
+  const _SubmitButton({required this.label, required this.enabled, required this.onTap});
+
+  @override
+  State<_SubmitButton> createState() => _SubmitButtonState();
+}
+
+class _SubmitButtonState extends State<_SubmitButton> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: widget.enabled ? (_) => setState(() => _pressed = true) : null,
+      onTapUp: widget.enabled ? (_) { setState(() => _pressed = false); widget.onTap(); } : null,
+      onTapCancel: () => setState(() => _pressed = false),
+      child: AnimatedScale(
+        scale: _pressed ? 0.97 : 1.0,
+        duration: const Duration(milliseconds: 100),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          width: double.infinity, height: 50.h,
+          decoration: BoxDecoration(
+            gradient: widget.enabled ? LinearGradient(colors: [AppColors.accent[60]!, AppColors.accent[70]!]) : null,
+            color: widget.enabled ? null : Colors.grey.withOpacity(0.2),
+            borderRadius: BorderRadius.circular(14.r),
+            boxShadow: widget.enabled ? [BoxShadow(color: AppColors.accent[60]!.withOpacity(0.35), blurRadius: 12, offset: const Offset(0, 4))] : null,
+          ),
+          child: Center(
+            child: Text(
+              widget.label,
+              style: GoogleFonts.cairo(fontSize: 15.sp, fontWeight: FontWeight.w700, color: widget.enabled ? Colors.white : Colors.grey),
+            ),
+          ),
         ),
       ),
     );

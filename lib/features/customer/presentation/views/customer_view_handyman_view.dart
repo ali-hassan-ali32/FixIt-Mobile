@@ -14,6 +14,7 @@ import '../../../../core/utils/widgets/app_page_header.dart';
 import '../../../../core/utils/widgets/app_rating_star.dart';
 import '../../../../core/utils/widgets/buttons/app_gradient_button.dart';
 import '../../../../core/utils/widgets/cards/app_section_card.dart';
+import '../../../handyman/presentation/cubit/handyman_cubit.dart';
 import '../../domain/entities/handyman_details_entity.dart';
 import '../cubit/customer_cubit.dart';
 import '../cubit/customer_state.dart';
@@ -238,8 +239,15 @@ abstract class _HandymanBase<T extends StatefulWidget> extends State<T>
     final h = handyman;
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
-    final statues = context.watch<CustomerCubit>().statisticsData;
-    final successRate = (statues?.completedRequests ?? 0.0 / (statues?.totalRequests ?? 0));
+
+    // final statistics = context.watch<HandymanCubit>().statisticsData;
+    //
+    // final completedJobs = statistics?.completedJobs ?? 0;
+    // final totalReviews = statistics?.totalReviews ?? 0;
+    //
+    // final successRate = completedJobs == 0
+    //     ? 0
+    //     : ((completedJobs / (completedJobs + totalReviews)) * 100).round();
 
     return AppSectionCard(
       isDark: isDark,
@@ -308,12 +316,12 @@ abstract class _HandymanBase<T extends StatefulWidget> extends State<T>
           SizedBox(height: 14.h),
           AppRatingStars(rating: h.averageRating, starSize: 20, showValue: true),
           SizedBox(height: 4.h),
-          Text(
-            '(${h.reviewsCount} ${l10n.handymanReviewsLabel})',
-            style: textTheme.bodySmall?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-            ),
-          ),
+          // Text(
+          //   '(${h.reviewsCount} ${l10n.handymanReviewsLabel})',
+          //   style: textTheme.bodySmall?.copyWith(
+          //     color: colorScheme.onSurfaceVariant,
+          //   ),
+          // ),
           SizedBox(height: 16.h),
           Divider(color: accent.withOpacity(0.10)),
           SizedBox(height: 14.h),
@@ -325,15 +333,15 @@ abstract class _HandymanBase<T extends StatefulWidget> extends State<T>
               _VDiv(),
               Expanded(
                 child: _Stat(
-                  value: statues?.completedRequests.toString() ?? '0.0',
-                  label: l10n.handymanStatJobs,
+                  value: h.reviewsCount.toString(),
+                  label: l10n.handymanReviewsLabel,
                 ),
               ),
               _VDiv(),
               Expanded(
                 child: _Stat(
-                  value: successRate == 0 ? 'N/A': successRate.toString(),
-                  label: l10n.handymanStatSuccess,
+                  value: h.basePrice.toString(),
+                  label: 'السعر المتاح',
                 ),
               ),
             ],
@@ -582,15 +590,15 @@ abstract class _HandymanBase<T extends StatefulWidget> extends State<T>
       ),
       child: Row(
         children: [
-          Expanded(
-            child: AppActionButton(
-              label: l10n.handymanWriteReview,
-              icon: Icons.edit_outlined,
-              isSecondary: true,
-              onTap: () => showReviewModal(context, handyman.fullName),
-            ),
-          ),
-          SizedBox(width: 12.w),
+          // Expanded(
+          //   child: AppActionButton(
+          //     label: l10n.handymanWriteReview,
+          //     icon: Icons.edit_outlined,
+          //     isSecondary: true,
+          //     onTap: () => showReviewModal(context, handyman.fullName),
+          //   ),
+          // ),
+          // SizedBox(width: 12.w),
           Expanded(
             flex: 2,
             child: AppActionButton(
@@ -598,7 +606,10 @@ abstract class _HandymanBase<T extends StatefulWidget> extends State<T>
               icon: Icons.note_add_outlined,
               onTap: () => Navigator.of(
                 context,
-              ).pushNamed(AppRoutes.customerBookService),
+              ).pushNamed(
+                AppRoutes.customerBookService,
+                arguments: handyman.id,
+              ),
             ),
           ),
         ],
@@ -628,7 +639,7 @@ class _HandymanMobileBodyState extends _HandymanBase<_HandymanMobileBody> {
     final l10n = AppLocalizations.of(context)!;
     final cubit = context.watch<CustomerCubit>();
 
-    final handyman = cubit.handymanDetails!;
+    // final handyman = cubit.handymanDetails!;successRate
 
     return BlocBuilder<CustomerCubit, CustomerState>(
       builder: (context, state) {
@@ -641,18 +652,15 @@ class _HandymanMobileBodyState extends _HandymanBase<_HandymanMobileBody> {
           );
         }
 
-        if (state is CustomerError && cubit.handymanDetails == null) {
-          return Scaffold(
+        if (cubit.handymanDetails == null) {
+          return const Scaffold(
             body: Center(
-              child: AppEmptyState(
-                icon: Icons.error_outline,
-                title: 'Something went wrong',
-                subtitle: state.message,
-                color: accent,
-              ),
+              child: CircularProgressIndicator(),
             ),
           );
         }
+
+        final handyman = cubit.handymanDetails!;
 
         return Scaffold(
           backgroundColor: Colors.transparent,

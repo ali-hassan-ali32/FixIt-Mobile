@@ -25,7 +25,7 @@ CreateServiceRequest _$CreateServiceRequestFromJson(
 Map<String, dynamic> _$CreateServiceRequestToJson(
   CreateServiceRequest instance,
 ) => <String, dynamic>{
-  'handymanId': instance.handymanId,
+  'handymanId': ?instance.handymanId,
   'categoryId': instance.categoryId,
   'cityId': instance.cityId,
   'regionId': instance.regionId,

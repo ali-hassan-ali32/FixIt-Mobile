@@ -7,6 +7,7 @@ part 'customer_request_details_model.g.dart';
 @JsonSerializable()
 class CustomerRequestDetailsModel {
   final String id;
+  final String? handymanId;
   final String? handymanName;
   final String title;
   final String description;
@@ -18,6 +19,7 @@ class CustomerRequestDetailsModel {
 
   const CustomerRequestDetailsModel({
     required this.id,
+    this.handymanId,
     required this.handymanName,
     required this.title,
     required this.description,
@@ -43,6 +45,7 @@ class CustomerRequestDetailsModel {
   CustomerRequestDetailsEntity toEntity() {
     return CustomerRequestDetailsEntity(
       id: id,
+      handymanId: handymanId,
       handymanName: handymanName,
       title: title,
       description: description,

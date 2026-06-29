@@ -215,39 +215,48 @@ abstract class _BookBase<T extends StatefulWidget> extends State<T>
       selTime!.minute,
     );
 
+    if (preselectedHandymanId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select a handyman first'),
+        ),
+      );
+      return;
+    }
+
     context.read<CustomerCubit>().createRequest(
       CreateServiceRequest(
-        handymanId: handymanId,
+        handymanId: preselectedHandymanId,
         categoryId: serviceType!,
         cityId: city!,
         regionId: area!,
-        title: titleCtrl.text.trim(),
+        title: titleCtrl.text.trim().isEmpty
+            ? 'Service Request'
+            : titleCtrl.text.trim(),
         description: descCtrl.text.trim(),
         addressLine: addressCtrl.text.trim(),
         scheduledAtUtc: scheduledDateTime.toUtc(),
-        estimatedDurationInMinutes:
-        isUrgent ? 30 : 60,
-        images: images
-            .where((e) => e != null)
-            .map((e) => e!.path)
-            .toList(),
+        estimatedDurationInMinutes: isUrgent ? 30 : 60,
+        images: const ['string'],
       ),
     );
   }
-  void _showSuccess() {
+  void _showSuccess(String requestId) {
+    requestId = requestId.replaceAll('"', '');
     final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (_) => _SuccessDialog(
-        requestNumber: '#REQ-00124',
+        requestNumber: '#${requestId.substring(0, 5)}',
         l10n: l10n,
         onDone: () {
+          debugPrint('REQ-: $requestId');
           Navigator.of(context).pop();
           Navigator.of(context).pushNamedAndRemoveUntil(
             AppRoutes.customerTrackRequestPending,
             (r) => r.settings.name == AppRoutes.customerHome,
-            arguments: 'REQ-00121',
+            arguments: requestId,
           );
         },
       ),
@@ -368,7 +377,7 @@ abstract class _BookBase<T extends StatefulWidget> extends State<T>
                 ),
               ),
               child: Text(
-                'bookingSelectedHandyman',
+                preselectedHandymanId ?? '',
                 style: GoogleFonts.cairo(
                   fontWeight: FontWeight.w600,
                 ),
@@ -771,7 +780,7 @@ class _BookMobileBodyState extends _BookBase<_BookMobileBody> {
 
         if (state is CustomerMessage) {
           setState(() => isSubmitting = false);
-          _showSuccess();
+          _showSuccess(state.message.replaceAll('"', ''));
         }
 
         if (state is CustomerError) {
@@ -864,7 +873,7 @@ class _BookTabletBodyState extends _BookBase<_BookTabletBody> {
 
         if (state is CustomerMessage) {
           setState(() => isSubmitting = false);
-          _showSuccess();
+          _showSuccess(state.message.replaceAll('"', ''));
         }
 
         if (state is CustomerError) {

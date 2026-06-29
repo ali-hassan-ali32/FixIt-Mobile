@@ -1211,31 +1211,33 @@ class _LangToggleState extends State<_LangToggle>
             mainAxisSize: MainAxisSize.min,
             children: ['AR', 'EN'].map((lang) {
               final isActive = (lang == 'AR') == widget.isAr;
-              return AnimatedContainer(
+              return AnimatedScale(
                 duration: const Duration(milliseconds: 200),
-                curve: Curves.easeOutBack,
-                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-                decoration: BoxDecoration(
-                  color: isActive ? widget.accent : Colors.transparent,
-                  borderRadius: BorderRadius.circular(16.r),
-                  boxShadow: isActive
-                      ? [
-                    BoxShadow(
-                      color: widget.accent.withOpacity(0.30),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
+                scale: isActive ? 1 : 0.96,
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                  decoration: BoxDecoration(
+                    color: isActive ? widget.accent : Colors.transparent,
+                    borderRadius: BorderRadius.circular(16.r),
+                    boxShadow: isActive
+                        ? [
+                      BoxShadow(
+                        color: widget.accent.withOpacity(0.30),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ]
+                        : null,
+                  ),
+                  child: Text(
+                    lang,
+                    style: GoogleFonts.cairo(
+                      fontSize: 12.sp,
+                      fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
+                      color: isActive
+                          ? Colors.white
+                          : Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
-                  ]
-                      : [],
-                ),
-                child: Text(
-                  lang,
-                  style: GoogleFonts.cairo(
-                    fontSize: 12.sp,
-                    fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
-                    color: isActive
-                        ? Colors.white
-                        : Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
               );

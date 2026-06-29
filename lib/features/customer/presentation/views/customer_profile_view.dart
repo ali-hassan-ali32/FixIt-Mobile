@@ -188,25 +188,25 @@ abstract class _ProfileBase<T extends StatefulWidget> extends State<T> with Tick
                   color: Colors.white,
                 ),
               ),
-              Container(
-                width: 28.w,
-                height: 28.w,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.15),
-                      blurRadius: 6,
-                    ),
-                  ],
-                ),
-                child: Icon(
-                  Icons.camera_alt_rounded,
-                  size: 14.sp,
-                  color: AppColors.primary[60],
-                ),
-              ),
+              // Container(
+              //   width: 28.w,
+              //   height: 28.w,
+              //   decoration: BoxDecoration(
+              //     shape: BoxShape.circle,
+              //     color: Colors.white,
+              //     boxShadow: [
+              //       BoxShadow(
+              //         color: Colors.black.withOpacity(0.15),
+              //         blurRadius: 6,
+              //       ),
+              //     ],
+              //   ),
+              //   child: Icon(
+              //     Icons.camera_alt_rounded,
+              //     size: 14.sp,
+              //     color: AppColors.primary[60],
+              //   ),
+              // ),
             ],
           ),
         ),

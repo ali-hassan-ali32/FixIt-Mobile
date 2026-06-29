@@ -562,8 +562,10 @@ abstract class _HomeBase<T extends StatefulWidget> extends State<T>
           arguments: h.id,
         );
       },
-      onBook: () => Navigator.of(context).pushNamed(AppRoutes.customerBookService),
-    );}
+      onBook: () => Navigator.of(context).pushNamed(
+        AppRoutes.customerBookService,
+        arguments: h.id,
+      ),    );}
 }
 
 // ══════════════════════════════════════════════════════════════

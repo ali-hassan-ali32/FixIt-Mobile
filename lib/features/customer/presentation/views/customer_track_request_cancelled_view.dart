@@ -162,7 +162,10 @@ abstract class _CancelledBase<T extends StatefulWidget> extends State<T>
         3,
         AppGradientButton(
           label: l10n.trackRebookBtn,
-          onTap: () => Navigator.of(context).pushNamed(AppRoutes.customerBookService),
+          onTap: () => Navigator.of(context).pushNamed(
+            AppRoutes.customerBookService,
+            arguments: d.id,
+          ),
           gradient: LinearGradient(colors: [AppColors.primary[60]!, AppColors.secondary[60]!]),
           shadowColor: AppColors.primary[60]!.withOpacity(0.30),
           height: 54,

@@ -16,6 +16,7 @@ import '../../../../core/utils/widgets/animations/animated_confirm_dialog.dart';
 import '../../../../core/utils/widgets/animations/app_motion.dart';
 import '../../../../core/utils/widgets/app_empty_states.dart';
 import '../../../../core/utils/widgets/cards/app_handyman_request_card.dart';
+import '../../../notifications/presentaions/cubit/notification_cubit.dart';
 import '../../domain/entities/handyman_job_summary_entity.dart';
 import '../cubit/handyman_cubit.dart';
 import '../cubit/handyman_state.dart';
@@ -261,9 +262,7 @@ abstract class _HomeBase<T extends StatefulWidget> extends State<T>
                         name: profile?.fullName ?? (isAr ? 'غير معرف' : 'UnKnown'),
                         avatarUrl: profile?.avatarUrl,
                         category: profile?.category,
-                        onTap: () => Navigator.of(
-                          ctx,
-                        ).pushNamed(AppRoutes.handymanProfile),
+                        onTap: () {},
                       ),
                       _HeaderBell(
                         bellShake: _bellShake,
@@ -304,8 +303,7 @@ abstract class _HomeBase<T extends StatefulWidget> extends State<T>
                       SizedBox(width: 10.w),
                       Expanded(
                         child: _RatingStatCard(
-                          rating: statistics?.averageRating ?? 0.0,
-                          label: l10n.handymanStatRating,
+                          rating: double.parse((statistics?.averageRating ?? 0.0).toStringAsFixed(2)),                          label: l10n.handymanStatRating,
                         ),
                       ),
                     ],
@@ -739,33 +737,16 @@ class _MobileBodyState extends _HomeBase<_MobileBody> {
               current is HandymanError,
           builder: (context, state) {
             final cubit = context.read<HandymanCubit>();
-
-            if (state is HandymanLoading) {
-              return const Center(child: CircularProgressIndicator());
-            }
-
-            if (state is HandymanError) {
-              return Center(child: Text(state.message));
-            }
-
             final requests = cubit.availableRequestsData;
-
-            if (requests.isEmpty) {
-              return Center(
-                child: AppEmptyState(
-                  icon: Icons.inbox_outlined,
-                  title: l10n.requestEmptyTitle,
-                  subtitle: l10n.requestEmptySubtitle,
-                  color: teal,
-                ),
-              );
-            }
 
             return CustomScrollView(
               slivers: [
                 SliverPadding(
-                    padding: EdgeInsetsGeometry.symmetric(vertical: AppSpacing.md.h),
-                    sliver: SliverToBoxAdapter(child: buildHeader(context, l10n))),
+                  padding: EdgeInsets.symmetric(vertical: AppSpacing.md.h),
+                  sliver: SliverToBoxAdapter(
+                    child: buildHeader(context, l10n),
+                  ),
+                ),
 
                 SliverToBoxAdapter(
                   child: Transform.translate(
@@ -774,8 +755,14 @@ class _MobileBodyState extends _HomeBase<_MobileBody> {
                   ),
                 ),
 
-                SliverToBoxAdapter(child: sa(1, buildQuickActions(context, l10n))),
-                SliverToBoxAdapter(child: sa(3, buildSectionTitle(context, l10n))),
+                SliverToBoxAdapter(
+                  child: sa(1, buildQuickActions(context, l10n)),
+                ),
+
+                SliverToBoxAdapter(
+                  child: sa(3, buildSectionTitle(context, l10n)),
+                ),
+
                 SliverPadding(
                   padding: EdgeInsets.fromLTRB(
                     AppSpacing.xl.w,
@@ -783,28 +770,62 @@ class _MobileBodyState extends _HomeBase<_MobileBody> {
                     AppSpacing.xl.w,
                     MediaQuery.of(context).padding.bottom + 100.h,
                   ),
-                  sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                          (_, i) => sa(
-                        4,
-                        Padding(
-                          padding: EdgeInsets.only(bottom: 14.h),
-                          child: buildRequestCard(
-                            context,
-                            l10n,
-                            requests[i],
-                            isDark,
+                  sliver: () {
+                    if (state is HandymanLoading && requests.isEmpty) {
+                      return const SliverToBoxAdapter(
+                        child: Center(
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 40),
+                            child: CircularProgressIndicator(),
                           ),
                         ),
+                      );
+                    }
+
+                    if (state is HandymanError && requests.isEmpty) {
+                      return SliverToBoxAdapter(
+                        child: AppEmptyState(
+                          icon: Icons.error_outline,
+                          title: 'Something went wrong',
+                          subtitle: state.message,
+                          color: teal,
+                        ),
+                      );
+                    }
+
+                    if (requests.isEmpty) {
+                      return SliverToBoxAdapter(
+                        child: AppEmptyState(
+                          icon: Icons.inbox_outlined,
+                          title: l10n.requestEmptyTitle,
+                          subtitle: l10n.requestEmptySubtitle,
+                          color: teal,
+                        ),
+                      );
+                    }
+
+                    return SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                            (_, i) => sa(
+                          4,
+                          Padding(
+                            padding: EdgeInsets.only(bottom: 14.h),
+                            child: buildRequestCard(
+                              context,
+                              l10n,
+                              requests[i],
+                              isDark,
+                            ),
+                          ),
+                        ),
+                        childCount: requests.length,
                       ),
-                      childCount: requests.length,
-                    ),
-                  ),
-                )
+                    );
+                  }(),
+                ),
               ],
             );
-          },
-        ),
+          },        ),
       ),
     );
   }
@@ -1051,35 +1072,40 @@ class _HeaderBell extends StatelessWidget {
               color: Colors.white,
             ),
           ),
-          // Positioned(
-          //   top: 6.h,
-          //   right: 6.w,
-          //   child: Container(
-          //     width: 18.w,
-          //     height: 18.h,
-          //     decoration: BoxDecoration(
-          //       color: const Color(0xFFff4757),
-          //       shape: BoxShape.circle,
-          //       border: Border.all(color: Colors.white, width: 2),
-          //       boxShadow: [
-          //         BoxShadow(
-          //           color: const Color(0xFFff4757).withOpacity(0.45),
-          //           blurRadius: 6,
-          //         ),
-          //       ],
-          //     ),
-          //     child: Center(
-          //       child: Text(
-          //         badge,
-          //         style: GoogleFonts.cairo(
-          //           fontSize: 9.sp,
-          //           fontWeight: FontWeight.w700,
-          //           color: Colors.white,
-          //         ),
-          //       ),
-          //     ),
-          //   ),
-          // ),
+          Positioned(
+            top: 6.h,
+            right: 6.w,
+            child: Container(
+              width: 18.w,
+              height: 18.h,
+              decoration: BoxDecoration(
+                color: const Color(0xFFff4757),
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 2),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFFff4757).withOpacity(0.45),
+                    blurRadius: 6,
+                  ),
+                ],
+              ),
+              child: Center(
+                child: Text(
+                  context
+                      .watch<NotificationCubit>()
+                      .notifications
+                      .where((e) => !e.isRead)
+                      .length
+                      .toString(),
+                  style: GoogleFonts.cairo(
+                    fontSize: 9.sp,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     ),
@@ -1146,7 +1172,7 @@ class _HomeStatCard extends StatelessWidget {
 // _RatingStatCard — radial ring  (can go in app_stat_card.dart)
 // ─────────────────────────────────────────────────────────────
 class _RatingStatCard extends StatelessWidget {
-  final double rating;
+  final num rating;
   final String label;
   const _RatingStatCard({required this.rating, required this.label});
 
@@ -1183,7 +1209,7 @@ class _RatingStatCard extends StatelessWidget {
         ),
         SizedBox(height: 4.h),
         Text(
-          '$rating',
+          rating.toStringAsFixed(1),
           style: GoogleFonts.cairo(
             fontSize: 16.sp,
             fontWeight: FontWeight.w800,

@@ -461,6 +461,8 @@
   "ratingAlreadyRated": "Thank you! You have already rated this request",
   "ratingThanks": "Thank you! You gave",
   "ratingStars": "stars",
+  "ratingCommentLabel": "Your comment (optional)",
+  "ratingCommentHint": "Share your experience with the handyman...",
 
   "trackStepCancelled": "Request Cancelled",
   "trackStepCancelledDesc": "The request was cancelled by the customer",

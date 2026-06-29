@@ -1366,6 +1366,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get ratingStars => 'نجوم';
 
   @override
+  String get ratingCommentLabel => 'تعليقك (اختياري)';
+
+  @override
+  String get ratingCommentHint => 'شاركنا تجربتك مع الفني...';
+
+  @override
   String get trackStepCancelled => 'تم إلغاء الطلب';
 
   @override

@@ -567,15 +567,15 @@ abstract class _RegHandymanBase<T extends StatefulWidget> extends State<T>
               : null,
         ),
         SizedBox(height: 16.h),
-        AppFileUploader(
-          label: l10n.profilePhoto,
-          hint: l10n.uploadProfilePhoto,
-          userType: AppUserType.handyman,
-          icon: Icons.photo_camera_outlined,
-          isSelected: profilePhotoSelected,
-          selectedFileName: profilePhotoName ?? l10n.profilePhoto,
-          onTap: pickProfilePhoto,
-        ),
+        // AppFileUploader(
+        //   label: l10n.profilePhoto,
+        //   hint: l10n.uploadProfilePhoto,
+        //   userType: AppUserType.handyman,
+        //   icon: Icons.photo_camera_outlined,
+        //   isSelected: profilePhotoSelected,
+        //   selectedFileName: profilePhotoName ?? l10n.profilePhoto,
+        //   onTap: pickProfilePhoto,
+        // ),
         SizedBox(height: 20.h),
 
         AppTermsCheckbox(

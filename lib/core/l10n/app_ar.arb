@@ -472,6 +472,8 @@
   "ratingAlreadyRated": "شكراً! لقد قمت بتقييم هذا الطلب مسبقاً",
   "ratingThanks": "شكراً! أعطيت",
   "ratingStars": "نجوم",
+  "ratingCommentLabel": "تعليقك (اختياري)",
+  "ratingCommentHint": "شاركنا تجربتك مع الفني...",
 
   "trackStepCancelled": "تم إلغاء الطلب",
   "trackStepCancelledDesc": "تم إلغاء الطلب من قبل العميل",

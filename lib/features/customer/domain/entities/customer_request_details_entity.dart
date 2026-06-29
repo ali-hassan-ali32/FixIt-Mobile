@@ -1,5 +1,6 @@
 class CustomerRequestDetailsEntity {
   final String id;
+  final String? handymanId;
   final String? handymanName;
   final String title;
   final String description;
@@ -11,6 +12,7 @@ class CustomerRequestDetailsEntity {
 
   const CustomerRequestDetailsEntity({
     required this.id,
+    this.handymanId,
     required this.handymanName,
     required this.title,
     required this.description,
